@@ -7,10 +7,18 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/** Simpan & hapus foto bukti tugas (di-resize agar hemat ruang). */
+/**
+ * Simpan & hapus foto bukti tugas.
+ * Setiap foto dipotong-tengah jadi kotak lalu diperkecil ke 400x400 dan
+ * disimpan sebagai WebP (~15-30 KB) agar sangat hemat ruang penyimpanan.
+ */
 class ProofPhoto
 {
-    public const MAX_SIDE = 1280;
+    /** Sisi keluaran (kotak). */
+    public const SIZE = 400;
+
+    /** Kualitas WebP/JPEG (0-100). */
+    public const QUALITY = 80;
 
     public static function store(UploadedFile $file, Child $child): ?string
     {
@@ -27,37 +35,51 @@ class ProofPhoto
         // Putar sesuai EXIF bila tersedia (foto kamera HP).
         if (function_exists('exif_read_data') && in_array($file->getMimeType(), ['image/jpeg', 'image/jpg'])) {
             $exif = @exif_read_data($file->getRealPath());
-            $img = match ($exif['Orientation'] ?? 1) {
+            $rotated = match ($exif['Orientation'] ?? 1) {
                 3 => imagerotate($img, 180, 0),
                 6 => imagerotate($img, -90, 0),
                 8 => imagerotate($img, 90, 0),
-                default => $img,
+                default => null,
             };
+            if ($rotated !== false && $rotated !== null) {
+                imagedestroy($img);
+                $img = $rotated;
+            }
         }
 
-        // Kecilkan bila lebih besar dari MAX_SIDE.
+        // Potong bagian tengah menjadi kotak, lalu skala ke SIZE x SIZE.
         $w = imagesx($img);
         $h = imagesy($img);
-        $scale = min(1, self::MAX_SIDE / max($w, $h));
+        $side = min($w, $h);
+        $srcX = intdiv($w - $side, 2);
+        $srcY = intdiv($h - $side, 2);
 
-        if ($scale < 1) {
-            $img = imagescale($img, (int) round($w * $scale), (int) round($h * $scale));
-        }
+        $dst = imagecreatetruecolor(self::SIZE, self::SIZE);
+        // Latar putih untuk PNG/WebP transparan.
+        imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
+        imagecopyresampled($dst, $img, 0, 0, $srcX, $srcY, self::SIZE, self::SIZE, $side, $side);
 
-        // Ratakan ke latar putih (untuk PNG/WebP transparan) lalu simpan sebagai JPEG.
-        $flat = imagecreatetruecolor(imagesx($img), imagesy($img));
-        imagefill($flat, 0, 0, imagecolorallocate($flat, 255, 255, 255));
-        imagecopy($flat, $img, 0, 0, 0, 0, imagesx($img), imagesy($img));
+        // Utamakan WebP; bila GD server tanpa dukungan WebP, jatuh ke JPEG.
+        $useWebp = function_exists('imagewebp');
 
         ob_start();
-        imagejpeg($flat, null, 82);
-        $jpeg = ob_get_clean();
+        if ($useWebp) {
+            imagewebp($dst, null, self::QUALITY);
+        } else {
+            imagejpeg($dst, null, self::QUALITY);
+        }
+        $data = ob_get_clean();
 
         imagedestroy($img);
-        imagedestroy($flat);
+        imagedestroy($dst);
 
-        $path = 'bukti/'.$child->id.'/'.now()->format('Ymd').'-'.Str::random(20).'.jpg';
-        Storage::disk('public')->put($path, $jpeg);
+        if ($data === false || $data === '') {
+            return null;
+        }
+
+        $ext = $useWebp ? 'webp' : 'jpg';
+        $path = 'bukti/'.$child->id.'/'.now()->format('Ymd').'-'.Str::random(20).'.'.$ext;
+        Storage::disk('public')->put($path, $data);
 
         return $path;
     }
