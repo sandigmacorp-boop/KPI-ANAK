@@ -71,7 +71,7 @@
         try {
             const body = new FormData();
             if (board?.dataset.date) body.append('date', board.dataset.date);
-            if (photoFile) body.append('photo', photoFile);
+            if (photoFile) body.append('photo', await shrinkImage(photoFile));
 
             const res = await fetch(item.dataset.toggleUrl, {
                 method: 'POST',
@@ -112,6 +112,33 @@
         } finally {
             delete item.dataset.pending;
             item.classList.remove('pending');
+        }
+    }
+
+    // Perkecil & kompres foto di perangkat sebelum dikirim: hemat kuota dan
+    // lolos batas upload server (foto HP 3-8 MB jadi ~150 KB). Server tetap
+    // menyimpannya sebagai WebP 400x400.
+    async function shrinkImage(file, maxSide = 1000, quality = 0.8) {
+        if (!file || !file.type || !file.type.startsWith('image/') || typeof createImageBitmap !== 'function') {
+            return file;
+        }
+        try {
+            const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+            const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+            const w = Math.max(1, Math.round(bitmap.width * scale));
+            const h = Math.max(1, Math.round(bitmap.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+            bitmap.close && bitmap.close();
+            const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', quality));
+            // Pakai hasil ciut hanya bila memang lebih kecil dari aslinya.
+            return blob && blob.size < file.size
+                ? new File([blob], 'foto.jpg', { type: 'image/jpeg' })
+                : file;
+        } catch {
+            return file; // bila gagal, kirim foto asli (biar tetap bisa jalan)
         }
     }
 
