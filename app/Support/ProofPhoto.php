@@ -9,8 +9,10 @@ use Illuminate\Support\Str;
 
 /**
  * Simpan & hapus foto bukti tugas.
- * Setiap foto dipotong-tengah jadi kotak lalu diperkecil ke 400x400 dan
- * disimpan sebagai WebP (~15-30 KB) agar sangat hemat ruang penyimpanan.
+ * Bila ekstensi GD tersedia, foto dipotong-tengah jadi kotak, diperkecil ke
+ * 400x400, dan disimpan sebagai WebP (~15-30 KB) agar sangat hemat ruang.
+ * Bila GD TIDAK tersedia di server, berkas disimpan apa adanya (klien sudah
+ * memperkecil ~150 KB) supaya upload tetap berhasil — tidak error 500.
  */
 class ProofPhoto
 {
@@ -21,6 +23,35 @@ class ProofPhoto
     public const QUALITY = 80;
 
     public static function store(UploadedFile $file, Child $child): ?string
+    {
+        $processed = function_exists('imagecreatefromstring') ? self::toSquareImage($file) : null;
+
+        if ($processed !== null) {
+            [$data, $ext] = $processed;
+        } else {
+            // Cadangan tanpa GD: simpan berkas asli (aman & tetap kecil).
+            $data = @file_get_contents($file->getRealPath());
+            if ($data === false || $data === '') {
+                return null;
+            }
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+            if (! in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+                $ext = 'jpg';
+            }
+        }
+
+        $path = 'bukti/'.$child->id.'/'.now()->format('Ymd').'-'.Str::random(20).'.'.$ext;
+        Storage::disk('public')->put($path, $data);
+
+        return $path;
+    }
+
+    /**
+     * Olah foto dengan GD: rotasi EXIF → potong-tengah kotak → 400x400 → WebP.
+     *
+     * @return array{0: string, 1: string}|null  [byte gambar, ekstensi] atau null bila gagal
+     */
+    private static function toSquareImage(UploadedFile $file): ?array
     {
         $raw = @file_get_contents($file->getRealPath());
         if ($raw === false) {
@@ -55,7 +86,6 @@ class ProofPhoto
         $srcY = intdiv($h - $side, 2);
 
         $dst = imagecreatetruecolor(self::SIZE, self::SIZE);
-        // Latar putih untuk PNG/WebP transparan.
         imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
         imagecopyresampled($dst, $img, 0, 0, $srcX, $srcY, self::SIZE, self::SIZE, $side, $side);
 
@@ -77,11 +107,7 @@ class ProofPhoto
             return null;
         }
 
-        $ext = $useWebp ? 'webp' : 'jpg';
-        $path = 'bukti/'.$child->id.'/'.now()->format('Ymd').'-'.Str::random(20).'.'.$ext;
-        Storage::disk('public')->put($path, $data);
-
-        return $path;
+        return [$data, $useWebp ? 'webp' : 'jpg'];
     }
 
     public static function delete(?string $path): void
