@@ -57,10 +57,9 @@ class ReportController extends Controller
             'threeStarDays' => $activeDays->filter(fn ($d) => $d['percent'] >= Child::STAR_3)->count(),
             'streak' => $child->streak(),
             'taskRows' => $taskRows,
-            'balance' => $child->pointsBalance(),
-            'totalPoints' => $child->totalPoints(),
-            'spentPoints' => $child->pointsSpent(),
+            'breakdown' => $child->pointsBreakdown(),
             'pendingRedemptions' => $child->redemptions()->pending()->orderBy('created_at')->get(),
+            'adjustments' => $child->adjustments()->latest()->limit(10)->get(),
         ]);
     }
 }

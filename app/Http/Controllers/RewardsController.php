@@ -20,9 +20,7 @@ class RewardsController extends Controller
             'history' => $child->redemptions()
                 ->where(fn ($q) => $q->whereNotNull('delivered_at')->orWhereNotNull('canceled_at'))
                 ->latest()->limit(30)->get(),
-            'balance' => $child->pointsBalance(),
-            'total' => $child->totalPoints(),
-            'spent' => $child->pointsSpent(),
+            'breakdown' => $child->pointsBreakdown(),
         ]);
     }
 

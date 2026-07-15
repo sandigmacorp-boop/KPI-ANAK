@@ -47,6 +47,11 @@ class Child extends Model
         return $this->hasMany(Redemption::class);
     }
 
+    public function adjustments(): HasMany
+    {
+        return $this->hasMany(PointAdjustment::class);
+    }
+
     /** Tugas aktif yang terjadwal pada tanggal tertentu, urut sesuai waktu. */
     public function tasksForDate(CarbonInterface $date)
     {
@@ -216,10 +221,37 @@ class Child extends Model
         return (int) $this->redemptions()->whereNull('canceled_at')->sum('cost');
     }
 
-    /** Saldo poin yang bisa ditukar = total terkumpul − total ditukar. */
+    /** Total penyesuaian manual (bonus positif − pelanggaran negatif). */
+    public function adjustmentsTotal(): int
+    {
+        return (int) $this->adjustments()->sum('amount');
+    }
+
+    /** Saldo poin yang bisa ditukar = poin tugas + penyesuaian − yang ditukar. */
     public function pointsBalance(): int
     {
-        return $this->totalPoints() - $this->pointsSpent();
+        return $this->totalPoints() + $this->adjustmentsTotal() - $this->pointsSpent();
+    }
+
+    /**
+     * Rincian saldo untuk ditampilkan.
+     *
+     * @return array{from_tasks:int, bonus:int, penalty:int, spent:int, balance:int}
+     */
+    public function pointsBreakdown(): array
+    {
+        $fromTasks = $this->totalPoints();
+        $bonus = (int) $this->adjustments()->where('amount', '>', 0)->sum('amount');
+        $penalty = (int) $this->adjustments()->where('amount', '<', 0)->sum('amount'); // negatif atau 0
+        $spent = $this->pointsSpent();
+
+        return [
+            'from_tasks' => $fromTasks,
+            'bonus' => $bonus,
+            'penalty' => $penalty,
+            'spent' => $spent,
+            'balance' => $fromTasks + $bonus + $penalty - $spent,
+        ];
     }
 
     public function canAfford(Reward $reward): bool

@@ -43,8 +43,25 @@
         <section class="card balance-hero">
             <span class="balance-num">🏅 {{ number_format($balance, 0, ',', '.') }}</span>
             <span class="stat-cap">Poinku sekarang</span>
-            <span class="muted balance-sub">terkumpul {{ number_format($total, 0, ',', '.') }} · sudah ditukar {{ number_format($spent, 0, ',', '.') }}</span>
+            <span class="balance-sub">@include('partials.balance-breakdown', ['b' => $breakdown])</span>
         </section>
+
+        {{-- Bonus & pengurangan poin dari orang tua --}}
+        @if ($adjustments->isNotEmpty())
+            <section class="card">
+                <h3 class="card-title">🎉 Bonus & Catatan Poin</h3>
+                @foreach ($adjustments as $adj)
+                    <div class="reward-row">
+                        <span class="reward-emoji" aria-hidden="true">{{ $adj->emoji() }}</span>
+                        <span class="reward-body">
+                            <span class="reward-title">{{ $adj->reason ?: ($adj->isBonus() ? 'Bonus poin' : 'Pengurangan poin') }}</span>
+                            <span class="muted">{{ $adj->created_at->translatedFormat('j M Y') }}</span>
+                        </span>
+                        <span class="adj-amount {{ $adj->isBonus() ? 'plus' : 'minus' }}">{{ $adj->signed() }}</span>
+                    </div>
+                @endforeach
+            </section>
+        @endif
 
         {{-- Katalog tukar poin --}}
         <section class="card">

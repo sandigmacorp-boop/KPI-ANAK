@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
+use App\Models\PointAdjustment;
 use App\Models\Reward;
 use App\Models\Task;
 use App\Models\TaskCompletion;
@@ -111,5 +112,10 @@ class DatabaseSeeder extends Seeder
 
         // Contoh: Kakak sudah menukar es krim, menunggu diberikan orang tua.
         $kakak->redeem($esKrim);
+
+        // Contoh penyesuaian poin: bonus & pengurangan.
+        PointAdjustment::create(['child_id' => $kakak->id, 'amount' => 20, 'reason' => 'Bantu cuci piring tanpa disuruh']);
+        PointAdjustment::create(['child_id' => $kakak->id, 'amount' => -10, 'reason' => 'Lupa merapikan mainan']);
+        PointAdjustment::create(['child_id' => $adik->id, 'amount' => 15, 'reason' => 'Berbagi mainan dengan kakak']);
     }
 }

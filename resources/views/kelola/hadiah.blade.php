@@ -7,8 +7,9 @@
 @php($rewardEmojis = ['🎁', '🍦', '🍕', '🎮', '⚽', '🚲', '🧸', '🎨', '📚', '🎬', '🏖️', '💰', '👟', '🎂', '🍭', '🎡'])
 
 @section('content')
-    <p class="date-line">Poin {{ $child->name }}: 🏅 <b>{{ number_format($balance, 0, ',', '.') }}</b>
-        <span class="muted">(terkumpul {{ number_format($total, 0, ',', '.') }} − ditukar {{ number_format($spent, 0, ',', '.') }})</span>
+    <p class="date-line">Poin {{ $child->name }}: 🏅 <b>{{ number_format($breakdown['balance'], 0, ',', '.') }}</b>
+        · @include('partials.balance-breakdown', ['b' => $breakdown])
+        · <a href="{{ route('points.index', $child) }}">⚖️ Atur poin</a>
     </p>
 
     @if ($pending->isNotEmpty())

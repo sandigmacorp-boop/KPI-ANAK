@@ -32,13 +32,14 @@
         </section>
 
         <section class="card">
-            <h3 class="card-title">🎁 Poin & Hadiah <small><a href="{{ route('rewards.index', $child) }}">Kelola →</a></small></h3>
-            <p>Saldo poin: <b>🏅 {{ number_format($balance, 0, ',', '.') }}</b>
-                <span class="muted">(terkumpul {{ number_format($totalPoints, 0, ',', '.') }} − ditukar {{ number_format($spentPoints, 0, ',', '.') }})</span>
+            <h3 class="card-title">🎁 Poin & Hadiah
+                <small><a href="{{ route('points.index', $child) }}">⚖️ Atur poin</a> · <a href="{{ route('rewards.index', $child) }}">🎁 Hadiah</a></small>
+            </h3>
+            <p>Saldo poin: <b>🏅 {{ number_format($breakdown['balance'], 0, ',', '.') }}</b><br>
+                @include('partials.balance-breakdown', ['b' => $breakdown])
             </p>
-            @if ($pendingRedemptions->isEmpty())
-                <p class="muted">Tidak ada penukaran yang menunggu diberikan.</p>
-            @else
+
+            @if ($pendingRedemptions->isNotEmpty())
                 @foreach ($pendingRedemptions as $redemption)
                     <div class="reward-row">
                         <span class="reward-emoji" aria-hidden="true">{{ $redemption->emoji }}</span>
@@ -49,6 +50,19 @@
                         <span class="chip chip-gift">perlu diberikan</span>
                     </div>
                 @endforeach
+            @endif
+
+            @if ($adjustments->isNotEmpty())
+                <table class="table" style="margin-top: 10px;">
+                    <tbody>
+                    @foreach ($adjustments as $adj)
+                        <tr>
+                            <td>{{ $adj->emoji() }} {{ $adj->reason ?: ($adj->isBonus() ? 'Bonus' : 'Pengurangan') }}</td>
+                            <td class="num"><b class="adj-amount {{ $adj->isBonus() ? 'plus' : 'minus' }}">{{ $adj->signed() }}</b></td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
             @endif
         </section>
 

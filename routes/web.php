@@ -5,6 +5,7 @@ use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\ChildrenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KidController;
+use App\Http\Controllers\PointsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RewardsController;
 use App\Http\Controllers\SettingsController;
@@ -52,6 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/kelola/hadiah/{reward}/aktif', [RewardsController::class, 'toggleActive'])->name('rewards.active');
     Route::post('/kelola/tukar/{redemption}/berikan', [RewardsController::class, 'deliver'])->name('redemptions.deliver');
     Route::post('/kelola/tukar/{redemption}/batal', [RewardsController::class, 'cancel'])->name('redemptions.cancel');
+
+    Route::get('/kelola/anak/{child}/poin', [PointsController::class, 'index'])->name('points.index');
+    Route::post('/kelola/anak/{child}/poin', [PointsController::class, 'store'])->name('points.store');
+    Route::delete('/kelola/poin/{adjustment}', [PointsController::class, 'destroy'])->name('points.destroy');
 
     Route::get('/kelola/anak/{child}/tugas', [TasksController::class, 'index'])->name('tasks.index');
     Route::post('/kelola/anak/{child}/tugas', [TasksController::class, 'store'])->name('tasks.store');

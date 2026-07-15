@@ -20,6 +20,7 @@
             <div class="row-actions">
                 <a class="btn btn-primary" href="{{ route('tasks.index', $child) }}">📋 Tugas</a>
                 <a class="btn btn-ghost" href="{{ route('rewards.index', $child) }}">🎁 Hadiah</a>
+                <a class="btn btn-ghost" href="{{ route('points.index', $child) }}">⚖️ Poin</a>
                 <button type="button" class="btn btn-ghost" data-dialog="dlg-link-{{ $child->id }}">🔗 Link</button>
                 <button type="button" class="btn btn-ghost" data-dialog="dlg-anak-{{ $child->id }}">✏️ Edit</button>
                 <form method="post" action="{{ route('children.destroy', $child) }}"
