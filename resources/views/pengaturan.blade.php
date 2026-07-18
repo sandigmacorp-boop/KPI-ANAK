@@ -37,6 +37,37 @@
         </form>
     </section>
 
+    <section class="card form">
+        <h3 class="card-title">📨 Notifikasi Telegram</h3>
+        @if (! $telegram['enabled'])
+            <p class="muted">Bot Telegram belum dikonfigurasi di server. Isi <code>TELEGRAM_BOT_TOKEN</code> di file <code>.env</code> server (lihat panduan di README/DEPLOY).</p>
+        @elseif ($telegram['linked'])
+            <p>✅ Telegram <b>terhubung</b>. Kamu menerima pengingat tugas tiap slot waktu & rekap mingguan.</p>
+            <div class="row-actions">
+                <form method="post" action="{{ route('settings.telegram.test') }}">
+                    @csrf
+                    <button class="btn btn-ghost btn-sm">🔔 Kirim tes</button>
+                </form>
+                <form method="post" action="{{ route('settings.telegram.unlink') }}" data-confirm="Putuskan koneksi Telegram?">
+                    @csrf
+                    <button class="btn btn-danger btn-sm">Putuskan</button>
+                </form>
+            </div>
+        @elseif ($telegram['deep_link'])
+            <p class="muted">Dapatkan pengingat tugas & rekap mingguan lewat Telegram — tetap masuk walau aplikasi tertutup.</p>
+            <ol class="tg-steps">
+                <li>Buka bot lalu tekan <b>START</b>: <a href="{{ $telegram['deep_link'] }}" target="_blank" rel="noopener">{{ '@'.$telegram['bot'] }} ↗</a></li>
+                <li>Kembali ke sini dan tekan tombol di bawah.</li>
+            </ol>
+            <form method="post" action="{{ route('settings.telegram.link') }}">
+                @csrf
+                <button class="btn btn-primary btn-block">✅ Saya sudah tekan START — Hubungkan</button>
+            </form>
+        @else
+            <p class="errors">Token bot terdeteksi, tapi info bot tak terbaca. Pastikan <code>TELEGRAM_BOT_TOKEN</code> benar.</p>
+        @endif
+    </section>
+
     @if ($children->isNotEmpty())
         <section class="card form">
             <h3 class="card-title">🔗 Link Mode Anak</h3>

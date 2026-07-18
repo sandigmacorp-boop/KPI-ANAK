@@ -11,12 +11,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'password', 'telegram_chat_id', 'telegram_link_code'])]
+#[Hidden(['password', 'remember_token', 'telegram_chat_id', 'telegram_link_code'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    public function telegramLinked(): bool
+    {
+        return filled($this->telegram_chat_id);
+    }
 
     /**
      * Get the attributes that should be cast.

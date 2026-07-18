@@ -67,4 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengaturan', [SettingsController::class, 'show'])->name('settings');
     Route::post('/pengaturan/profil', [SettingsController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/pengaturan/sandi', [SettingsController::class, 'updatePassword'])->name('settings.password');
+    Route::post('/pengaturan/telegram/hubungkan', [SettingsController::class, 'linkTelegram'])->name('settings.telegram.link');
+    Route::post('/pengaturan/telegram/tes', [SettingsController::class, 'testTelegram'])->name('settings.telegram.test');
+    Route::post('/pengaturan/telegram/putus', [SettingsController::class, 'unlinkTelegram'])->name('settings.telegram.unlink');
 });
