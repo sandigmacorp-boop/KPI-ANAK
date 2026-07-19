@@ -131,5 +131,13 @@ class DatabaseSeeder extends Seeder
             $child->update(['pet_xp' => $child->totalPoints()]);
             $child->syncAchievements();
         }
+
+        // Contoh mood 7 hari terakhir.
+        $moodPattern = ['senang', 'semangat', 'biasa', 'lelah', 'senang', 'biasa', 'senang'];
+        foreach ([$kakak, $adik] as $ci => $child) {
+            foreach (range(6, 0) as $i) {
+                $child->setMood($moodPattern[($i + $ci) % count($moodPattern)], today()->subDays($i));
+            }
+        }
     }
 }

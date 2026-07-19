@@ -50,6 +50,8 @@
 
         @include('partials.pet-card')
 
+        @include('partials.mood-card', ['moodUrl' => route('kid.mood', $child->access_token)])
+
         @include('partials.checklist-board', ['mode' => 'kid'])
 
         <button type="button" id="enable-notif" class="btn btn-ghost btn-block" hidden

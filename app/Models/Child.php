@@ -65,6 +65,46 @@ class Child extends Model
         return $this->hasMany(ChildAchievement::class);
     }
 
+    public function moods(): HasMany
+    {
+        return $this->hasMany(DailyMood::class);
+    }
+
+    /** Mood tercatat untuk sebuah tanggal (key) atau null. */
+    public function moodFor(CarbonInterface $date): ?string
+    {
+        return $this->moods()->whereDate('date', $date->toDateString())->value('mood');
+    }
+
+    public function setMood(string $mood, CarbonInterface $date): void
+    {
+        // whereDate wajib: kolom cast `date` tersimpan sebagai "Y-m-d H:i:s".
+        $existing = $this->moods()->whereDate('date', $date->toDateString())->first();
+
+        if ($existing) {
+            $existing->update(['mood' => $mood]);
+        } else {
+            $this->moods()->create(['date' => $date->toDateString(), 'mood' => $mood]);
+        }
+    }
+
+    /** @return array<int, array{date: CarbonInterface, mood: ?string}> mood N hari terakhir (lama→baru). */
+    public function recentMoods(int $days): array
+    {
+        $rows = $this->moods()
+            ->whereDate('date', '>=', today()->subDays($days - 1)->toDateString())
+            ->get()
+            ->keyBy(fn (DailyMood $m) => $m->date->toDateString());
+
+        $out = [];
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $d = today()->subDays($i);
+            $out[] = ['date' => $d, 'mood' => $rows->get($d->toDateString())?->mood];
+        }
+
+        return $out;
+    }
+
     /** Tugas aktif yang terjadwal pada tanggal tertentu, urut sesuai waktu. */
     public function tasksForDate(CarbonInterface $date)
     {

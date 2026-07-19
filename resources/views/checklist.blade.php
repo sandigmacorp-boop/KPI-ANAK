@@ -20,5 +20,7 @@
 
     @include('partials.pet-card')
 
+    @include('partials.mood-card', ['moodUrl' => $day->isToday() ? route('checklist.mood', $child) : null])
+
     @include('partials.checklist-board', ['mode' => 'admin'])
 @endsection

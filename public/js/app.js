@@ -318,6 +318,29 @@
         return ok;
     }
 
+    // ---- Mood harian ----
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.mood-btn');
+        if (!btn) return;
+        const card = btn.closest('.mood-card');
+        const url = card && card.dataset.moodUrl;
+        if (!url || btn.classList.contains('selected')) return;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mood: btn.dataset.mood }),
+            });
+            if (res.status === 419) { location.reload(); return; }
+            if (!res.ok) throw new Error(String(res.status));
+            card.querySelectorAll('.mood-btn').forEach((b) => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        } catch {
+            alert('Gagal menyimpan perasaan. Coba lagi ya.');
+        }
+    });
+
     // ---- Dialog / bottom sheet ----
     document.addEventListener('click', (e) => {
         const opener = e.target.closest('[data-dialog]');

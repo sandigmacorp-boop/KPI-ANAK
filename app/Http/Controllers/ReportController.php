@@ -61,6 +61,7 @@ class ReportController extends Controller
             'breakdown' => $child->pointsBreakdown(),
             'pendingRedemptions' => $child->redemptions()->pending()->orderBy('created_at')->get(),
             'adjustments' => $child->adjustments()->latest()->limit(10)->get(),
+            'moods' => $child->recentMoods(14),
         ]);
     }
 }

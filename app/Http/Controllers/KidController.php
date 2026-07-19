@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Child;
 use App\Models\Reward;
 use App\Models\Task;
+use App\Support\Mood;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class KidController extends Controller
 {
@@ -94,6 +96,16 @@ class KidController extends Controller
             'titles' => $pending->take(5)->map(fn (Task $t) => $t->emoji.' '.$t->title)->values(),
             'balance' => $child->pointsBalance(),
         ]);
+    }
+
+    /** Anak mencatat perasaannya hari ini. */
+    public function setMood(Request $request, string $token)
+    {
+        $child = Child::where('access_token', $token)->firstOrFail();
+        $data = $request->validate(['mood' => ['required', Rule::in(array_keys(Mood::MOODS))]]);
+        $child->setMood($data['mood'], today());
+
+        return response()->json(['ok' => true, 'mood' => $data['mood']]);
     }
 
     public function toggle(Request $request, string $token, Task $task)

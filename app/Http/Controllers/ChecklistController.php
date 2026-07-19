@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Child;
 use App\Models\Task;
+use App\Support\Mood;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 class ChecklistController extends Controller
 {
@@ -41,6 +43,16 @@ class ChecklistController extends Controller
 
         // Orang tua boleh mencentang tanpa foto (mereka sendiri verifikatornya).
         return response()->json($child->togglePayload($task, $day, $request->file('photo')));
+    }
+
+    /** Orang tua mencatat/mengubah mood anak untuk hari ini. */
+    public function setMood(Request $request, Child $child)
+    {
+        $this->authorizeChild($request, $child);
+        $data = $request->validate(['mood' => ['required', Rule::in(array_keys(Mood::MOODS))]]);
+        $child->setMood($data['mood'], today());
+
+        return response()->json(['ok' => true, 'mood' => $data['mood']]);
     }
 
     private function authorizeChild(Request $request, Child $child): void

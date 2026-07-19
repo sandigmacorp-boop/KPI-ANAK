@@ -416,6 +416,28 @@ body {
 .badge-sub { font-size: 10px; font-weight: 700; color: var(--ink-2); }
 .badge .bar.bar-mini { width: 100%; max-width: 72px; height: 6px; margin-top: 2px; }
 
+/* ---------- Mood harian ---------- */
+.mood-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.mood-btn {
+    flex: 1; min-width: 62px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 10px 4px; border: 2px solid var(--line); border-radius: 14px;
+    background: var(--surface); cursor: pointer; font: inherit;
+    transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.mood-btn .mood-emoji { font-size: 28px; line-height: 1; }
+.mood-btn small { font-size: 11px; font-weight: 700; color: var(--ink-2); }
+.mood-btn.selected { border-color: var(--child, var(--brand)); background: color-mix(in srgb, var(--child, var(--brand)) 10%, #fff); }
+.mood-btn.selected small { color: var(--ink); }
+.mood-btn:active { transform: scale(0.95); }
+.mood-readonly { font-size: 18px; font-weight: 800; margin: 0; }
+
+.mood-strip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.mood-day { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 34px; }
+.mood-strip-emoji { font-size: 22px; line-height: 1.2; }
+.mood-day small { font-size: 10px; color: var(--ink-2); font-weight: 700; }
+.mood-day.today small { color: var(--brand); }
+
 .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 11px; }
 .btn[disabled] { opacity: 0.45; pointer-events: none; }
 

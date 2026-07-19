@@ -28,6 +28,8 @@ Route::get('/c/{token}/pengingat', [KidController::class, 'reminder'])
     ->middleware('throttle:120,1')->name('kid.reminder');
 Route::post('/c/{token}/toggle/{task}', [KidController::class, 'toggle'])
     ->middleware('throttle:60,1')->name('kid.toggle');
+Route::post('/c/{token}/mood', [KidController::class, 'setMood'])
+    ->middleware('throttle:60,1')->name('kid.mood');
 Route::post('/c/{token}/tukar/{reward}', [KidController::class, 'redeem'])
     ->middleware('throttle:20,1')->name('kid.redeem');
 
@@ -38,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/anak/{child}/checklist/{date?}', [ChecklistController::class, 'show'])
         ->where('date', '\d{4}-\d{2}-\d{2}')->name('checklist');
     Route::post('/anak/{child}/toggle/{task}', [ChecklistController::class, 'toggle'])->name('checklist.toggle');
+    Route::post('/anak/{child}/mood', [ChecklistController::class, 'setMood'])->name('checklist.mood');
     Route::get('/anak/{child}/laporan', [ReportController::class, 'show'])->name('report');
 
     Route::get('/kelola', [ChildrenController::class, 'index'])->name('children.index');

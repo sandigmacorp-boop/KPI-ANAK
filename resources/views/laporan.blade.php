@@ -85,6 +85,24 @@
             @endif
         </section>
 
+        <section class="card">
+            @php($moodCounts = collect($moods)->pluck('mood')->filter()->countBy()->sortDesc())
+            <h3 class="card-title">😊 Mood 14 Hari
+                @if ($moodCounts->isNotEmpty())
+                    <small class="muted">paling sering {{ \App\Support\Mood::emoji($moodCounts->keys()->first()) }} {{ \App\Support\Mood::label($moodCounts->keys()->first()) }}</small>
+                @endif
+            </h3>
+            <div class="mood-strip">
+                @foreach ($moods as $m)
+                    <div class="mood-day {{ $m['date']->isToday() ? 'today' : '' }}"
+                         title="{{ $m['date']->translatedFormat('l, j M') }}: {{ $m['mood'] ? \App\Support\Mood::label($m['mood']) : 'belum dicatat' }}">
+                        <span class="mood-strip-emoji">{{ \App\Support\Mood::emoji($m['mood']) }}</span>
+                        <small>{{ $m['date']->translatedFormat('j') }}</small>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
         @include('partials.achievements')
 
         <p class="legend muted">Bintang harian: ⭐⭐⭐ ≥ {{ \App\Models\Child::STAR_3 }}% · ⭐⭐ ≥ {{ \App\Models\Child::STAR_2 }}% · ⭐ ≥ {{ \App\Models\Child::STAR_1 }}% — Streak 🔥 terhitung bila KPI ≥ {{ \App\Models\Child::STREAK_MIN }}%.</p>
