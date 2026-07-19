@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
+use App\Models\Household;
 use App\Models\PointAdjustment;
 use App\Models\Reward;
 use App\Models\Task;
@@ -15,7 +16,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $household = Household::create(['name' => 'Keluarga Sandigma']);
+
         $user = User::create([
+            'household_id' => $household->id,
             'name' => 'Orang Tua',
             'email' => 'sandigmacorp@gmail.com',
             'password' => 'kpianak123',
@@ -23,6 +27,7 @@ class DatabaseSeeder extends Seeder
 
         $kakak = Child::create([
             'user_id' => $user->id,
+            'household_id' => $household->id,
             'name' => 'Kakak',
             'emoji' => '🦁',
             'color' => '#7C3AED',
@@ -31,6 +36,7 @@ class DatabaseSeeder extends Seeder
 
         $adik = Child::create([
             'user_id' => $user->id,
+            'household_id' => $household->id,
             'name' => 'Adik',
             'emoji' => '🐰',
             'color' => '#D97706',

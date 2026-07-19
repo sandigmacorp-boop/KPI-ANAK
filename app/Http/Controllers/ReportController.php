@@ -11,7 +11,7 @@ class ReportController extends Controller
 {
     public function show(Request $request, Child $child)
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
 
         $today = today();
         $from30 = $today->copy()->subDays(29);

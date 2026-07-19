@@ -96,16 +96,16 @@ class RewardsController extends Controller
 
     private function authorizeChild(Request $request, Child $child): void
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
     }
 
     private function authorizeReward(Request $request, Reward $reward): void
     {
-        abort_unless($reward->child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($reward->child), 403);
     }
 
     private function authorizeRedemption(Request $request, Redemption $redemption): void
     {
-        abort_unless($redemption->child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($redemption->child), 403);
     }
 }

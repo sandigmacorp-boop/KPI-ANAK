@@ -44,7 +44,7 @@ class PointsController extends Controller
 
     public function destroy(Request $request, PointAdjustment $adjustment)
     {
-        abort_unless($adjustment->child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($adjustment->child), 403);
 
         $child = $adjustment->child;
         $adjustment->delete();
@@ -55,6 +55,6 @@ class PointsController extends Controller
 
     private function authorizeChild(Request $request, Child $child): void
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
     }
 }

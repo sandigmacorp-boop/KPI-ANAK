@@ -45,7 +45,7 @@ class ChecklistController extends Controller
 
     private function authorizeChild(Request $request, Child $child): void
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
     }
 
     private function resolveDate(?string $date): Carbon

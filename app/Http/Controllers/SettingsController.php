@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Child;
+use App\Models\User;
 use App\Services\Telegram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -27,8 +29,42 @@ class SettingsController extends Controller
 
         return view('pengaturan', [
             'children' => $user->children()->orderBy('created_at')->get(),
+            'parents' => $user->householdMembers()->orderBy('created_at')->get(),
             'telegram' => $telegram,
         ]);
+    }
+
+    /** Tambah orang tua kedua ke keluarga yang sama. */
+    public function addParent(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:60'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+        ]);
+
+        User::create([
+            'household_id' => $request->user()->household_id,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+        ]);
+
+        return redirect()->route('settings')
+            ->with('ok', "Orang tua {$data['name']} ditambahkan — sekarang bisa login sendiri dengan email & sandi itu.");
+    }
+
+    public function removeParent(Request $request, User $user)
+    {
+        $me = $request->user();
+        abort_unless($user->household_id === $me->household_id, 403);
+        abort_if($user->id === $me->id, 400);
+
+        // Pindahkan "pembuat" anak ke diri sendiri agar anak tidak ikut terhapus (cascade user_id).
+        Child::where('user_id', $user->id)->update(['user_id' => $me->id]);
+        $user->delete();
+
+        return redirect()->route('settings')->with('ok', "Akun {$user->name} dihapus dari keluarga.");
     }
 
     public function updateProfile(Request $request)

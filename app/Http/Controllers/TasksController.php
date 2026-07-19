@@ -91,11 +91,11 @@ class TasksController extends Controller
 
     private function authorizeChild(Request $request, Child $child): void
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
     }
 
     private function authorizeTask(Request $request, Task $task): void
     {
-        abort_unless($task->child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($task->child), 403);
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\UploadedFile;
 
-#[Fillable(['user_id', 'name', 'emoji', 'color', 'access_token'])]
+#[Fillable(['user_id', 'household_id', 'name', 'emoji', 'color', 'access_token'])]
 class Child extends Model
 {
     /** Ambang KPI (persen) untuk bintang & streak. */
@@ -22,9 +22,15 @@ class Child extends Model
     /** Palet identitas anak — urutan tervalidasi aman buta-warna (validate_palette.js). */
     public const COLORS = ['#7C3AED', '#D97706', '#0D9488', '#DB2777', '#0369A1', '#65A30D'];
 
-    public function user(): BelongsTo
+    public function household(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Household::class);
+    }
+
+    /** Orang tua yang menambahkan anak ini (informasional). */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tasks(): HasMany

@@ -38,6 +38,52 @@
     </section>
 
     <section class="card form">
+        <h3 class="card-title">👨‍👩‍👧 Orang Tua</h3>
+        <p class="muted">Semua orang tua di keluarga ini bisa login sendiri & memantau anak yang sama.</p>
+        @foreach ($parents as $parent)
+            <div class="kid-link-row">
+                <span class="kid-link-name">
+                    {{ $parent->name }}
+                    @if ($parent->id === auth()->id()) <span class="chip">Anda</span> @endif
+                    @if ($parent->telegramLinked()) <span class="chip chip-done" title="Telegram aktif">📨</span> @endif
+                    <br><small class="muted">{{ $parent->email }}</small>
+                </span>
+                @if ($parent->id !== auth()->id())
+                    <form method="post" action="{{ route('settings.parents.remove', $parent) }}"
+                          data-confirm="Hapus akun {{ $parent->name }}? Dia tidak bisa login lagi (data anak tetap aman).">
+                        @csrf @method('DELETE')
+                        <button class="iconbtn" aria-label="Hapus {{ $parent->name }}">🗑️</button>
+                    </form>
+                @endif
+            </div>
+        @endforeach
+        <button type="button" class="btn btn-primary btn-block" data-dialog="dlg-ortu" style="margin-top: 12px;">➕ Tambah Orang Tua</button>
+    </section>
+
+    <dialog id="dlg-ortu" class="sheet">
+        <form method="post" action="{{ route('settings.parents.add') }}">
+            @csrf
+            <input type="hidden" name="_form" value="dlg-ortu">
+            <div class="sheet-head">
+                <h3>Tambah Orang Tua</h3>
+                <button type="button" class="iconbtn" data-close aria-label="Tutup">✕</button>
+            </div>
+            @include('partials.errors')
+            <p class="muted">Buatkan akun untuk Ayah/Bunda. Mereka login dengan email & sandi ini.</p>
+            <label class="field">Nama
+                <input name="name" maxlength="60" required value="{{ old('_form') === 'dlg-ortu' ? old('name') : '' }}">
+            </label>
+            <label class="field">Email
+                <input type="email" name="email" required value="{{ old('_form') === 'dlg-ortu' ? old('email') : '' }}">
+            </label>
+            <label class="field">Kata sandi <small class="muted">(min. 6 karakter)</small>
+                <input type="password" name="password" required autocomplete="new-password">
+            </label>
+            <button class="btn btn-primary btn-block">Simpan</button>
+        </form>
+    </dialog>
+
+    <section class="card form">
         <h3 class="card-title">📨 Notifikasi Telegram</h3>
         @if (! $telegram['enabled'])
             <p class="muted">Bot Telegram belum dikonfigurasi di server. Isi <code>TELEGRAM_BOT_TOKEN</code> di file <code>.env</code> server (lihat panduan di README/DEPLOY).</p>

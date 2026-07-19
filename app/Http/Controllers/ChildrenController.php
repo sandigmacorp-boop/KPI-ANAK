@@ -24,6 +24,7 @@ class ChildrenController extends Controller
     {
         $data = $this->validated($request);
         $data['user_id'] = $request->user()->id;
+        $data['household_id'] = $request->user()->household_id;
         $data['access_token'] = Str::random(40);
 
         Child::create($data);
@@ -68,6 +69,6 @@ class ChildrenController extends Controller
 
     private function authorizeChild(Request $request, Child $child): void
     {
-        abort_unless($child->user_id === $request->user()->id, 403);
+        abort_unless($request->user()->owns($child), 403);
     }
 }
