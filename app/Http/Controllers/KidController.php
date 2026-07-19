@@ -35,6 +35,7 @@ class KidController extends Controller
     public function performa(string $token)
     {
         $child = Child::where('access_token', $token)->firstOrFail();
+        $child->syncAchievements();
 
         $today = today();
         $stats = $child->statsForDate($today);

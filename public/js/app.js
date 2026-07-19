@@ -108,6 +108,7 @@
 
             updateBoard(data);
             updatePet(data.pet);
+            if (data.achievements && data.achievements.length) celebrateAchievements(data.achievements);
         } catch {
             alert('Gagal menyimpan. Periksa koneksi lalu coba lagi.');
         } finally {
@@ -261,6 +262,14 @@
             + pet.species + ' ' + pet.stage_name + ' 🎉');
         const em = document.getElementById('pet-emoji');
         if (em) { em.classList.remove('bounce'); void em.offsetWidth; em.classList.add('bounce'); }
+    }
+
+    function celebrateAchievements(list) {
+        confetti(100);
+        playChime();
+        const a = list[0];
+        celebrateToast('<span class="big">' + a.emoji + '</span>Lencana baru!<br><b>' + a.title + '</b>'
+            + (list.length > 1 ? ' <small>+' + (list.length - 1) + ' lagi</small>' : ''));
     }
 
     function updatePet(pet) {

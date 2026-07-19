@@ -85,6 +85,8 @@
             @endif
         </section>
 
+        @include('partials.achievements')
+
         <p class="legend muted">Bintang harian: ⭐⭐⭐ ≥ {{ \App\Models\Child::STAR_3 }}% · ⭐⭐ ≥ {{ \App\Models\Child::STAR_2 }}% · ⭐ ≥ {{ \App\Models\Child::STAR_1 }}% — Streak 🔥 terhitung bila KPI ≥ {{ \App\Models\Child::STREAK_MIN }}%.</p>
     </div>
 @endsection

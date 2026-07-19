@@ -143,6 +143,8 @@
             @include('partials.week-bars')
         </section>
 
+        @include('partials.achievements')
+
         @if ($history->isNotEmpty())
             <details class="numbers">
                 <summary>Hadiah yang pernah kudapat ({{ $history->where('canceled_at', null)->count() }})</summary>

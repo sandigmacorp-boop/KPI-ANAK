@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Achievements;
 use App\Support\Pet;
 use App\Support\ProofPhoto;
 use Carbon\CarbonInterface;
@@ -57,6 +58,11 @@ class Child extends Model
     public function adjustments(): HasMany
     {
         return $this->hasMany(PointAdjustment::class);
+    }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(ChildAchievement::class);
     }
 
     /** Tugas aktif yang terjadwal pada tanggal tertentu, urut sesuai waktu. */
@@ -206,6 +212,74 @@ class Child extends Model
         return Pet::progress($this->pet_type ?? 'naga', (int) $this->pet_xp);
     }
 
+    /** Nilai metrik dasar untuk mengevaluasi lencana. */
+    public function achievementMetrics(): array
+    {
+        $stats = $this->dailyStats(today()->subDays(179), today());
+        $perfect = collect($stats)->filter(fn ($d) => $d['percent'] === 100)->count();
+
+        return [
+            'lifetime_tasks' => $this->completions()->count(),
+            'lifetime_points' => $this->totalPoints(),
+            'streak' => $this->streak(),
+            'perfect_days' => $perfect,
+            'pet_stage' => Pet::stageFor((int) $this->pet_xp),
+        ];
+    }
+
+    /** Berikan lencana yang syaratnya baru terpenuhi; kembalikan yang BARU diraih. */
+    public function syncAchievements(): \Illuminate\Support\Collection
+    {
+        $metrics = $this->achievementMetrics();
+        $owned = $this->achievements()->pluck('key')->all();
+        $newly = collect();
+
+        foreach (Achievements::LIST as $key => $def) {
+            if (in_array($key, $owned, true)) {
+                continue;
+            }
+            if (($metrics[$def['metric']] ?? 0) >= $def['threshold']) {
+                $this->achievements()->create(['key' => $key, 'earned_at' => now()]);
+                $newly->push(['key' => $key] + $def);
+            }
+        }
+
+        return $newly;
+    }
+
+    /** Daftar lencana untuk ditampilkan (yang diraih dulu, lalu terdekat). */
+    public function achievementsProgress(): array
+    {
+        $metrics = $this->achievementMetrics();
+        $earned = $this->achievements()->pluck('earned_at', 'key');
+
+        $out = [];
+        foreach (Achievements::LIST as $key => $def) {
+            $value = min((int) ($metrics[$def['metric']] ?? 0), $def['threshold']);
+            $out[] = [
+                'key' => $key,
+                'emoji' => $def['emoji'],
+                'title' => $def['title'],
+                'desc' => $def['desc'],
+                'earned' => $earned->has($key),
+                'earned_at' => $earned->get($key),
+                'value' => $value,
+                'threshold' => $def['threshold'],
+                'percent' => (int) round($value / max($def['threshold'], 1) * 100),
+            ];
+        }
+
+        usort($out, function ($a, $b) {
+            if ($a['earned'] !== $b['earned']) {
+                return $a['earned'] ? -1 : 1;
+            }
+
+            return $a['earned'] ? 0 : $b['percent'] <=> $a['percent'];
+        });
+
+        return $out;
+    }
+
     /** Toggle tugas lalu kembalikan payload JSON siap pakai untuk front-end. */
     public function togglePayload(Task $task, CarbonInterface $date, ?UploadedFile $photo = null): array
     {
@@ -224,6 +298,8 @@ class Child extends Model
             'photo_url' => ProofPhoto::url($result['photo_path']),
             'balance' => $this->pointsBalance(),
             'pet' => $this->petProgress(),
+            'achievements' => $this->syncAchievements()
+                ->map(fn ($a) => ['emoji' => $a['emoji'], 'title' => $a['title']])->values(),
         ];
     }
 

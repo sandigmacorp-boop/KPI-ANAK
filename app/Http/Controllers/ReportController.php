@@ -12,6 +12,7 @@ class ReportController extends Controller
     public function show(Request $request, Child $child)
     {
         abort_unless($request->user()->owns($child), 403);
+        $child->syncAchievements();
 
         $today = today();
         $from30 = $today->copy()->subDays(29);
