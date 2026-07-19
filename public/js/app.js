@@ -107,6 +107,7 @@
             }
 
             updateBoard(data);
+            updatePet(data.pet);
         } catch {
             alert('Gagal menyimpan. Periksa koneksi lalu coba lagi.');
         } finally {
@@ -162,6 +163,7 @@
                 all.classList.remove('pop');
                 void all.offsetWidth; // restart animasi
                 all.classList.add('pop');
+                celebrateAllDone();
             } else if (!d.all_done) {
                 all.hidden = true;
             }
@@ -194,6 +196,86 @@
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 5000);
+    }
+
+    // ---- Perayaan: confetti, bunyi, peliharaan naik level ----
+    function confetti(count) {
+        const colors = ['#7C3AED', '#F59E0B', '#22C55E', '#DB2777', '#0EA5E9', '#FBBF24'];
+        const wrap = document.createElement('div');
+        wrap.className = 'confetti-wrap';
+        for (let i = 0; i < (count || 80); i++) {
+            const p = document.createElement('div');
+            p.className = 'confetti';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.background = colors[i % colors.length];
+            p.style.animationDuration = (2 + Math.random() * 1.6) + 's';
+            p.style.animationDelay = (Math.random() * 0.4) + 's';
+            if (Math.random() < 0.5) p.style.borderRadius = '50%';
+            wrap.appendChild(p);
+        }
+        document.body.appendChild(wrap);
+        setTimeout(() => wrap.remove(), 4200);
+    }
+
+    function playChime() {
+        try {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            const ctx = new AC();
+            [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => { // C E G C
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.value = f;
+                const t = ctx.currentTime + i * 0.11;
+                g.gain.setValueAtTime(0.0001, t);
+                g.gain.exponentialRampToValueAtTime(0.22, t + 0.02);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start(t);
+                o.stop(t + 0.34);
+            });
+            setTimeout(() => ctx.close(), 900);
+        } catch {}
+    }
+
+    function celebrateToast(html) {
+        const el = document.createElement('div');
+        el.className = 'celebrate-toast';
+        el.setAttribute('role', 'status');
+        el.innerHTML = html;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+    }
+
+    function celebrateAllDone() {
+        confetti(90);
+        playChime();
+    }
+
+    function celebratePetLevelUp(pet) {
+        confetti(120);
+        playChime();
+        celebrateToast('<span class="big">' + pet.emoji + '</span>Peliharaanmu naik ke <b>Level ' + pet.level + '</b>!<br>'
+            + pet.species + ' ' + pet.stage_name + ' 🎉');
+        const em = document.getElementById('pet-emoji');
+        if (em) { em.classList.remove('bounce'); void em.offsetWidth; em.classList.add('bounce'); }
+    }
+
+    function updatePet(pet) {
+        if (!pet) return;
+        const card = document.getElementById('pet-card');
+        if (!card) return;
+        const prev = parseInt(card.dataset.petStage || '0', 10);
+        const em = document.getElementById('pet-emoji');
+        if (em) em.textContent = pet.emoji;
+        const bar = document.getElementById('pet-bar');
+        if (bar) bar.style.width = pet.percent + '%';
+        const tn = document.getElementById('pet-tonext');
+        if (tn) tn.textContent = (pet.to_next || 0).toLocaleString('id-ID');
+        card.dataset.petStage = pet.stage;
+        if (pet.stage > prev) celebratePetLevelUp(pet);
     }
 
     // ---- Salin link (dengan fallback untuk http LAN) ----

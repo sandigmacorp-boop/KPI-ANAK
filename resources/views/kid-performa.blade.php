@@ -39,6 +39,8 @@
             <div class="errors" role="alert">{{ session('err') }}</div>
         @endif
 
+        @include('partials.pet-card')
+
         {{-- Saldo poin --}}
         <section class="card balance-hero">
             <span class="balance-num">🏅 {{ number_format($balance, 0, ',', '.') }}</span>

@@ -9,12 +9,14 @@
     @forelse ($children as $row)
         @php($child = $row['child'])
         @php($stats = $row['stats'])
+        @php($pet = $child->petProgress())
         <section class="card child-card" style="--child: {{ $child->color }}">
             <div class="child-head">
                 <div class="avatar" aria-hidden="true">{{ $child->emoji }}</div>
                 <div class="child-meta">
                     <h2>{{ $child->name }}</h2>
                     <div class="chips">
+                        <span class="chip" title="{{ $pet['species'] }} {{ $pet['stage_name'] }}">{{ $pet['emoji'] }} Lv {{ $pet['level'] }}</span>
                         <span class="chip" title="Hari beruntun mencapai target">🔥 {{ $row['streak'] }} hari</span>
                         <span class="chip">🏅 {{ $stats['earned_points'] }}/{{ $stats['total_points'] }} poin</span>
                         @if ($row['pending_redemptions'] > 0)

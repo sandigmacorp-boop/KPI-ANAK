@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Pet;
 use App\Support\ProofPhoto;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\UploadedFile;
 
-#[Fillable(['user_id', 'household_id', 'name', 'emoji', 'color', 'access_token'])]
+#[Fillable(['user_id', 'household_id', 'name', 'emoji', 'color', 'pet_type', 'pet_xp', 'access_token'])]
 class Child extends Model
 {
     /** Ambang KPI (persen) untuk bintang & streak. */
@@ -190,7 +191,19 @@ class Child extends Model
             $done = true;
         }
 
+        // Jaga XP peliharaan = titik tertinggi poin tugas seumur hidup (tak menyusut).
+        $lifetime = $this->totalPoints();
+        if ($lifetime > (int) $this->pet_xp) {
+            $this->update(['pet_xp' => $lifetime]);
+        }
+
         return ['done' => $done, 'stats' => $this->statsForDate($date), 'photo_path' => $photoPath];
+    }
+
+    /** Progres peliharaan (tahap, level, emoji, XP menuju level berikut). */
+    public function petProgress(): array
+    {
+        return Pet::progress($this->pet_type ?? 'naga', (int) $this->pet_xp);
     }
 
     /** Toggle tugas lalu kembalikan payload JSON siap pakai untuk front-end. */
@@ -210,6 +223,7 @@ class Child extends Model
             'all_done' => $stats['total_tasks'] > 0 && $stats['done_tasks'] === $stats['total_tasks'],
             'photo_url' => ProofPhoto::url($result['photo_path']),
             'balance' => $this->pointsBalance(),
+            'pet' => $this->petProgress(),
         ];
     }
 

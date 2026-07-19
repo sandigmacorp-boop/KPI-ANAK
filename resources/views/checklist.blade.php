@@ -18,5 +18,7 @@
         @endif
     </div>
 
+    @include('partials.pet-card')
+
     @include('partials.checklist-board', ['mode' => 'admin'])
 @endsection

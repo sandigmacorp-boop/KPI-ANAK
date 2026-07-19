@@ -60,6 +60,14 @@
                         @endforeach
                     </div>
                 </div>
+                <div class="field">
+                    <span class="field-label">Peliharaan</span>
+                    <div class="picker">
+                        @foreach (\App\Support\Pet::SPECIES as $key => $sp)
+                            <label class="pick pet-pick"><input type="radio" name="pet_type" value="{{ $key }}" @checked(($child->pet_type ?? 'naga') === $key)><span>{{ $sp['stages'][2] }}<small>{{ $sp['name'] }}</small></span></label>
+                        @endforeach
+                    </div>
+                </div>
                 <button class="btn btn-primary btn-block">Simpan</button>
             </form>
         </dialog>
@@ -112,6 +120,14 @@
                 <div class="picker">
                     @foreach (\App\Models\Child::COLORS as $c)
                         <label class="pick swatch"><input type="radio" name="color" value="{{ $c }}" @checked(old('color', \App\Models\Child::COLORS[0]) === $c)><span style="background: {{ $c }}"></span></label>
+                    @endforeach
+                </div>
+            </div>
+            <div class="field">
+                <span class="field-label">Peliharaan</span>
+                <div class="picker">
+                    @foreach (\App\Support\Pet::SPECIES as $key => $sp)
+                        <label class="pick pet-pick"><input type="radio" name="pet_type" value="{{ $key }}" @checked(old('pet_type', 'naga') === $key)><span>{{ $sp['stages'][2] }}<small>{{ $sp['name'] }}</small></span></label>
                     @endforeach
                 </div>
             </div>

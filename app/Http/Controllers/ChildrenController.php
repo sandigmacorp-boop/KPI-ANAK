@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Support\Pet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -64,6 +65,7 @@ class ChildrenController extends Controller
             'name' => ['required', 'string', 'max:50'],
             'emoji' => ['required', 'string', 'max:16'],
             'color' => ['required', Rule::in(Child::COLORS)],
+            'pet_type' => ['required', Rule::in(array_keys(Pet::SPECIES))],
         ]);
     }
 

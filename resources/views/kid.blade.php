@@ -48,6 +48,8 @@
             </a>
         @endif
 
+        @include('partials.pet-card')
+
         @include('partials.checklist-board', ['mode' => 'kid'])
 
         <button type="button" id="enable-notif" class="btn btn-ghost btn-block" hidden

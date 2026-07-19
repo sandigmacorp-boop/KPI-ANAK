@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Kakak',
             'emoji' => '🦁',
             'color' => '#7C3AED',
+            'pet_type' => 'naga',
             'access_token' => Str::random(40),
         ]);
 
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Adik',
             'emoji' => '🐰',
             'color' => '#D97706',
+            'pet_type' => 'kucing',
             'access_token' => Str::random(40),
         ]);
 
@@ -123,5 +125,10 @@ class DatabaseSeeder extends Seeder
         PointAdjustment::create(['child_id' => $kakak->id, 'amount' => 20, 'reason' => 'Bantu cuci piring tanpa disuruh']);
         PointAdjustment::create(['child_id' => $kakak->id, 'amount' => -10, 'reason' => 'Lupa merapikan mainan']);
         PointAdjustment::create(['child_id' => $adik->id, 'amount' => 15, 'reason' => 'Berbagi mainan dengan kakak']);
+
+        // XP peliharaan awal = total poin tugas yang sudah terkumpul.
+        foreach ([$kakak, $adik] as $child) {
+            $child->update(['pet_xp' => $child->totalPoints()]);
+        }
     }
 }
