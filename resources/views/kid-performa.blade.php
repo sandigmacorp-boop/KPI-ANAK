@@ -43,6 +43,8 @@
 
         @include('partials.family-goal', ['goal' => $familyGoal])
 
+        @include('partials.weekly-challenge')
+
         {{-- Saldo poin --}}
         <section class="card balance-hero">
             <span class="balance-num">🏅 {{ number_format($balance, 0, ',', '.') }}</span>

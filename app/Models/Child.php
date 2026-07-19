@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\Achievements;
 use App\Support\Pet;
 use App\Support\ProofPhoto;
+use App\Support\WeeklyChallenge;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -74,6 +75,67 @@ class Child extends Model
     public function moods(): HasMany
     {
         return $this->hasMany(DailyMood::class);
+    }
+
+    public function challengeCompletions(): HasMany
+    {
+        return $this->hasMany(ChallengeCompletion::class);
+    }
+
+    /** Metrik pekan berjalan (Sen–hari ini) untuk tantangan mingguan. */
+    public function weeklyChallengeMetrics(): array
+    {
+        $start = today()->startOfWeek();
+        $completions = $this->completions()
+            ->whereDate('date', '>=', $start->toDateString())
+            ->whereDate('date', '<=', today()->toDateString())
+            ->get();
+
+        $stats = $this->dailyStats($start, today());
+
+        return [
+            'weekly_tasks' => $completions->count(),
+            'weekly_points' => (int) collect($stats)->sum('earned_points'),
+            'weekly_perfect' => collect($stats)->filter(fn ($d) => $d['percent'] === 100)->count(),
+            'weekly_photos' => $completions->whereNotNull('photo_path')->count(),
+        ];
+    }
+
+    /** Progres tantangan pekan ini untuk ditampilkan. */
+    public function weeklyChallengeProgress(): array
+    {
+        $ch = WeeklyChallenge::current();
+        $metrics = $this->weeklyChallengeMetrics();
+        $value = min((int) ($metrics[$ch['metric']] ?? 0), $ch['target']);
+
+        return $ch + [
+            'value' => $value,
+            'percent' => (int) round($value / max($ch['target'], 1) * 100),
+            'completed' => $this->challengeCompletions()->where('week_key', WeeklyChallenge::weekKey())->exists(),
+        ];
+    }
+
+    /** Beri bonus bila tantangan pekan ini baru tuntas; kembalikan tantangan itu atau null. */
+    public function syncWeeklyChallenge(): ?array
+    {
+        $weekKey = WeeklyChallenge::weekKey();
+        if ($this->challengeCompletions()->where('week_key', $weekKey)->exists()) {
+            return null;
+        }
+
+        $ch = WeeklyChallenge::current();
+        if (($this->weeklyChallengeMetrics()[$ch['metric']] ?? 0) >= $ch['target']) {
+            $this->challengeCompletions()->create([
+                'week_key' => $weekKey,
+                'challenge_key' => $ch['key'],
+                'awarded_at' => now(),
+            ]);
+            $this->adjustments()->create(['amount' => $ch['bonus'], 'reason' => '🏆 Tantangan: '.$ch['title']]);
+
+            return $ch;
+        }
+
+        return null;
     }
 
     /** Mood tercatat untuk sebuah tanggal (key) atau null. */
@@ -331,6 +393,7 @@ class Child extends Model
     {
         $result = $this->toggleTask($task, $date, $photo);
         $stats = $result['stats'];
+        $wc = $this->syncWeeklyChallenge();
 
         return [
             'done' => $result['done'],
@@ -347,6 +410,9 @@ class Child extends Model
             'achievements' => $this->syncAchievements()
                 ->map(fn ($a) => ['emoji' => $a['emoji'], 'title' => $a['title']])->values(),
             'family_goal' => $this->familyGoalPayload(),
+            'weekly_challenge' => $this->weeklyChallengeProgress(),
+            'weekly_challenge_done' => $wc
+                ? ['emoji' => $wc['emoji'], 'title' => $wc['title'], 'bonus' => $wc['bonus']] : null,
         ];
     }
 

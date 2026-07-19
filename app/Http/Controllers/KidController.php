@@ -14,6 +14,7 @@ class KidController extends Controller
     public function show(string $token)
     {
         $child = Child::where('access_token', $token)->firstOrFail();
+        $child->syncWeeklyChallenge();
         $today = today();
         $stats = $child->statsForDate($today);
         $slot = Task::currentSlot();
@@ -39,6 +40,7 @@ class KidController extends Controller
     {
         $child = Child::where('access_token', $token)->firstOrFail();
         $child->syncAchievements();
+        $child->syncWeeklyChallenge();
 
         $today = today();
         $stats = $child->statsForDate($today);

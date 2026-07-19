@@ -110,6 +110,8 @@
             updatePet(data.pet);
             if (data.achievements && data.achievements.length) celebrateAchievements(data.achievements);
             updateFamilyGoal(data.family_goal);
+            updateWeeklyChallenge(data.weekly_challenge);
+            if (data.weekly_challenge_done) celebrateChallenge(data.weekly_challenge_done);
         } catch {
             alert('Gagal menyimpan. Periksa koneksi lalu coba lagi.');
         } finally {
@@ -271,6 +273,20 @@
         const a = list[0];
         celebrateToast('<span class="big">' + a.emoji + '</span>Lencana baru!<br><b>' + a.title + '</b>'
             + (list.length > 1 ? ' <small>+' + (list.length - 1) + ' lagi</small>' : ''));
+    }
+
+    function updateWeeklyChallenge(wc) {
+        if (!wc) return;
+        const bar = document.getElementById('wc-bar');
+        if (bar) bar.style.width = wc.percent + '%';
+        const v = document.getElementById('wc-value');
+        if (v) v.textContent = wc.value;
+    }
+
+    function celebrateChallenge(c) {
+        confetti(130);
+        playChime();
+        celebrateToast('<span class="big">' + c.emoji + '</span>Tantangan pekan ini selesai!<br><b>' + c.title + '</b> · +' + c.bonus + ' poin 🎉');
     }
 
     function updateFamilyGoal(fg) {
