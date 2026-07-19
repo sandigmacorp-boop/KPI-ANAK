@@ -19,4 +19,15 @@ class Household extends Model
     {
         return $this->hasMany(Child::class);
     }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(FamilyGoal::class);
+    }
+
+    /** Tujuan keluarga yang sedang berjalan (belum dirayakan), bila ada. */
+    public function activeGoal(): ?FamilyGoal
+    {
+        return $this->goals()->whereNull('claimed_at')->latest()->first();
+    }
 }

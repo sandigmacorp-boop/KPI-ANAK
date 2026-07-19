@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
+use App\Models\FamilyGoal;
 use App\Models\Household;
 use App\Models\PointAdjustment;
 use App\Models\Reward;
@@ -139,5 +140,14 @@ class DatabaseSeeder extends Seeder
                 $child->setMood($moodPattern[($i + $ci) % count($moodPattern)], today()->subDays($i));
             }
         }
+
+        // Contoh tujuan keluarga (di-backdate agar poin seed ikut menyumbang).
+        $goal = FamilyGoal::create([
+            'household_id' => $household->id,
+            'title' => 'Jalan-jalan ke pantai',
+            'emoji' => '🏖️',
+            'target' => 2000,
+        ]);
+        $goal->forceFill(['created_at' => today()->subDays(7)])->save();
     }
 }

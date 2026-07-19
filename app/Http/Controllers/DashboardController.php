@@ -31,6 +31,7 @@ class DashboardController extends Controller
             'children' => $children,
             'today' => $today,
             'slotNow' => $slot,
+            'familyGoal' => tap($request->user()->household?->activeGoal(), fn ($g) => $g?->refreshAchieved()),
         ]);
     }
 }

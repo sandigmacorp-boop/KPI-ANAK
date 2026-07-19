@@ -29,6 +29,12 @@ class Child extends Model
         return $this->belongsTo(Household::class);
     }
 
+    /** Tujuan keluarga aktif (berbagi dengan saudara sekeluarga). */
+    public function familyGoal(): ?FamilyGoal
+    {
+        return $this->household?->activeGoal();
+    }
+
     /** Orang tua yang menambahkan anak ini (informasional). */
     public function creator(): BelongsTo
     {
@@ -340,6 +346,28 @@ class Child extends Model
             'pet' => $this->petProgress(),
             'achievements' => $this->syncAchievements()
                 ->map(fn ($a) => ['emoji' => $a['emoji'], 'title' => $a['title']])->values(),
+            'family_goal' => $this->familyGoalPayload(),
+        ];
+    }
+
+    /** Ringkasan tujuan keluarga untuk front-end (null bila tak ada). */
+    private function familyGoalPayload(): ?array
+    {
+        $goal = $this->familyGoal();
+        if (! $goal) {
+            return null;
+        }
+
+        $achievedNow = $goal->refreshAchieved();
+
+        return [
+            'title' => $goal->title,
+            'emoji' => $goal->emoji,
+            'percent' => $goal->percent(),
+            'progress' => $goal->progress(),
+            'target' => $goal->target,
+            'achieved' => $goal->isAchieved(),
+            'achieved_now' => $achievedNow,
         ];
     }
 

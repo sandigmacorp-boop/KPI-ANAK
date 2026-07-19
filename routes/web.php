@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\ChildrenController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FamilyGoalController;
 use App\Http\Controllers\KidController;
 use App\Http\Controllers\PointsController;
 use App\Http\Controllers\ReportController;
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/anak/{child}/toggle/{task}', [ChecklistController::class, 'toggle'])->name('checklist.toggle');
     Route::post('/anak/{child}/mood', [ChecklistController::class, 'setMood'])->name('checklist.mood');
     Route::get('/anak/{child}/laporan', [ReportController::class, 'show'])->name('report');
+
+    Route::post('/kelola/tujuan', [FamilyGoalController::class, 'store'])->name('goals.store');
+    Route::post('/kelola/tujuan/{goal}/selesai', [FamilyGoalController::class, 'claim'])->name('goals.claim');
+    Route::delete('/kelola/tujuan/{goal}', [FamilyGoalController::class, 'destroy'])->name('goals.destroy');
 
     Route::get('/kelola', [ChildrenController::class, 'index'])->name('children.index');
     Route::post('/kelola/anak', [ChildrenController::class, 'store'])->name('children.store');

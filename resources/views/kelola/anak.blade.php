@@ -6,6 +6,61 @@
 @php($emojis = ['😀', '🦁', '🐰', '🐱', '🐼', '🦊', '🐧', '🦄', '🐢', '🐬', '🐥', '🚀'])
 
 @section('content')
+    <section class="card">
+        <h3 class="card-title">🤝 Tujuan Keluarga</h3>
+        @if ($activeGoal)
+            @include('partials.family-goal', ['goal' => $activeGoal])
+            <div class="row-actions">
+                @if ($activeGoal->isAchieved())
+                    <form method="post" action="{{ route('goals.claim', $activeGoal) }}">
+                        @csrf
+                        <button class="btn btn-primary btn-sm">🎉 Sudah dirayakan</button>
+                    </form>
+                @endif
+                <button type="button" class="btn btn-ghost btn-sm" data-dialog="dlg-goal">✏️ Ubah</button>
+                <form method="post" action="{{ route('goals.destroy', $activeGoal) }}" data-confirm="Hapus tujuan keluarga ini?">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-danger btn-sm">🗑️</button>
+                </form>
+            </div>
+        @else
+            <p class="muted">Buat target poin bersama — semua anak menyumbang untuk satu hadiah keluarga (tak mengurangi saldo pribadi).</p>
+            <button type="button" class="btn btn-primary btn-block" data-dialog="dlg-goal">➕ Buat Tujuan Keluarga</button>
+        @endif
+    </section>
+
+    <dialog id="dlg-goal" class="sheet">
+        <form method="post" action="{{ route('goals.store') }}">
+            @csrf
+            <input type="hidden" name="_form" value="dlg-goal">
+            <div class="sheet-head">
+                <h3>Tujuan Keluarga</h3>
+                <button type="button" class="iconbtn" data-close aria-label="Tutup">✕</button>
+            </div>
+            @include('partials.errors')
+            <label class="field">Nama tujuan
+                <input name="title" maxlength="80" required placeholder="contoh: Jalan-jalan ke pantai"
+                       value="{{ old('_form') === 'dlg-goal' ? old('title') : ($activeGoal->title ?? '') }}">
+            </label>
+            <div class="field">
+                <span class="field-label">Ikon</span>
+                <div class="picker">
+                    @php($goalEmojis = ['🎯', '🏖️', '🍕', '🎢', '🎬', '🏕️', '🎮', '🍦', '🎪', '🚗'])
+                    @php($goalEmoji = old('_form') === 'dlg-goal' ? old('emoji', '🎯') : ($activeGoal->emoji ?? '🎯'))
+                    @foreach ($goalEmojis as $e)
+                        <label class="pick"><input type="radio" name="emoji" value="{{ $e }}" @checked($goalEmoji === $e)><span>{{ $e }}</span></label>
+                    @endforeach
+                </div>
+            </div>
+            <label class="field">Target poin bersama
+                <input type="number" name="target" min="1" max="1000000" required
+                       value="{{ old('_form') === 'dlg-goal' ? old('target') : ($activeGoal->target ?? 1000) }}">
+            </label>
+            <p class="muted field-hint">Poin dari semua anak dijumlahkan menuju target ini. Saldo pribadi tiap anak tetap utuh.</p>
+            <button class="btn btn-primary btn-block">Simpan</button>
+        </form>
+    </dialog>
+
     <button type="button" class="btn btn-primary btn-block" data-dialog="dlg-anak-baru">➕ Tambah Anak</button>
 
     @forelse ($children as $child)

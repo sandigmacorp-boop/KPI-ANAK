@@ -18,7 +18,10 @@ class ChildrenController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('kelola.anak', ['children' => $children]);
+        return view('kelola.anak', [
+            'children' => $children,
+            'activeGoal' => tap($request->user()->household?->activeGoal(), fn ($g) => $g?->refreshAchieved()),
+        ]);
     }
 
     public function store(Request $request)

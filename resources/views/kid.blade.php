@@ -50,6 +50,8 @@
 
         @include('partials.pet-card')
 
+        @include('partials.family-goal', ['goal' => $familyGoal])
+
         @include('partials.mood-card', ['moodUrl' => route('kid.mood', $child->access_token)])
 
         @include('partials.checklist-board', ['mode' => 'kid'])

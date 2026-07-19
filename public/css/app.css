@@ -438,6 +438,15 @@ body {
 .mood-day small { font-size: 10px; color: var(--ink-2); font-weight: 700; }
 .mood-day.today small { color: var(--brand); }
 
+/* ---------- Tujuan keluarga ---------- */
+.goal-card.goal-achieved { background: linear-gradient(150deg, #FEF3C7, #FDE68A); box-shadow: inset 0 0 0 1.5px var(--amber); }
+.goal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.goal-emoji { font-size: 38px; line-height: 1; flex-shrink: 0; }
+.goal-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.goal-title { font-size: 15px; font-weight: 800; }
+.goal-bar { background: linear-gradient(90deg, #7C3AED, #DB2777); }
+.goal-contrib { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
 .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 11px; }
 .btn[disabled] { opacity: 0.45; pointer-events: none; }
 

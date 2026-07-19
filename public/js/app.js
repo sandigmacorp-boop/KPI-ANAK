@@ -109,6 +109,7 @@
             updateBoard(data);
             updatePet(data.pet);
             if (data.achievements && data.achievements.length) celebrateAchievements(data.achievements);
+            updateFamilyGoal(data.family_goal);
         } catch {
             alert('Gagal menyimpan. Periksa koneksi lalu coba lagi.');
         } finally {
@@ -270,6 +271,19 @@
         const a = list[0];
         celebrateToast('<span class="big">' + a.emoji + '</span>Lencana baru!<br><b>' + a.title + '</b>'
             + (list.length > 1 ? ' <small>+' + (list.length - 1) + ' lagi</small>' : ''));
+    }
+
+    function updateFamilyGoal(fg) {
+        if (!fg) return;
+        const bar = document.getElementById('fg-bar');
+        if (bar) bar.style.width = fg.percent + '%';
+        const p = document.getElementById('fg-progress');
+        if (p) p.textContent = (fg.progress || 0).toLocaleString('id-ID');
+        if (fg.achieved_now) {
+            confetti(150);
+            playChime();
+            celebrateToast('<span class="big">' + fg.emoji + '</span>Tujuan Keluarga tercapai!<br><b>' + fg.title + '</b> 🎉');
+        }
     }
 
     function updatePet(pet) {

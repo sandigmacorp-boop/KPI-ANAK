@@ -6,6 +6,8 @@
 @section('content')
     <p class="date-line">📅 {{ $today->translatedFormat('l, j F Y') }}</p>
 
+    @include('partials.family-goal', ['goal' => $familyGoal])
+
     @forelse ($children as $row)
         @php($child = $row['child'])
         @php($stats = $row['stats'])

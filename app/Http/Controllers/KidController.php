@@ -30,6 +30,7 @@ class KidController extends Controller
             'affordableCount' => $child->rewards()->where('is_active', true)->where('cost', '<=', $balance)->count(),
             'slotNow' => $slot,
             'slotPending' => $child->pendingTasksInSlot($slot, $today),
+            'familyGoal' => tap($child->familyGoal(), fn ($g) => $g?->refreshAchieved()),
         ]);
     }
 
@@ -61,6 +62,7 @@ class KidController extends Controller
             'history' => $child->redemptions()
                 ->where(fn ($q) => $q->whereNotNull('delivered_at')->orWhereNotNull('canceled_at'))
                 ->latest()->limit(10)->get(),
+            'familyGoal' => tap($child->familyGoal(), fn ($g) => $g?->refreshAchieved()),
         ]);
     }
 
