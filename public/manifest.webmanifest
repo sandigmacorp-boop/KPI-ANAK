@@ -3,7 +3,7 @@
     "short_name": "SANS FAMILY",
     "description": "Kontrol tugas rutin harian anak di rumah",
     "lang": "id",
-    "start_url": "/",
+    "start_url": "/beranda",
     "scope": "/",
     "display": "standalone",
     "orientation": "portrait",

@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->redirectUsersTo('/');
+        $middleware->redirectUsersTo(fn () => route('home'));
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
             'household.active' => \App\Http\Middleware\EnsureHouseholdActive::class,

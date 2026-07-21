@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\FamilyGoalController;
 use App\Http\Controllers\KidController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PointsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ReportController;
@@ -18,6 +19,9 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeamChallengeController;
 use Illuminate\Support\Facades\Route;
+
+// Landing page publik — media iklan sebelum login/daftar (auth -> lempar ke dashboard).
+Route::get('/', [LandingController::class, 'show'])->name('landing');
 
 // Autentikasi orang tua
 Route::middleware('guest')->group(function () {
@@ -65,7 +69,7 @@ Route::middleware(['auth', 'household.active', 'admin'])->group(function () {
 
 // Area orang tua
 Route::middleware(['auth', 'household.active'])->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('home');
+    Route::get('/beranda', [DashboardController::class, 'index'])->name('home');
 
     Route::get('/anak/{child}/checklist/{date?}', [ChecklistController::class, 'show'])
         ->where('date', '\d{4}-\d{2}-\d{2}')->name('checklist');
