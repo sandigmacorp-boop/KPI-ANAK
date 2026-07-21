@@ -28,6 +28,18 @@
             <div class="flash" role="status">✅ {{ session('ok') }}</div>
         @endif
 
+        @auth
+            @unless (auth()->user()->hasVerifiedEmail())
+                <div class="verify-banner" role="status">
+                    <span>📧 Verifikasi email Anda ({{ auth()->user()->email }}) untuk keamanan akun.</span>
+                    <form method="post" action="{{ route('verification.send') }}">
+                        @csrf
+                        <button class="linklike">Kirim ulang link</button>
+                    </form>
+                </div>
+            @endunless
+        @endauth
+
         @yield('content')
     </main>
 

@@ -123,6 +123,14 @@ body {
     animation: fadein 0.3s ease;
 }
 
+.verify-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    background: #DBEAFE; color: #1E3A8A;
+    border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;
+    font-weight: 600; font-size: 13px;
+}
+.verify-banner .linklike { color: #1E3A8A; text-decoration: underline; white-space: nowrap; }
+
 .errors {
     background: var(--bad-bg); color: var(--bad-ink);
     border: 1px solid #FCA5A5; border-radius: 12px;

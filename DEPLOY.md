@@ -169,6 +169,24 @@ Aplikasi ini sudah mendukung banyak keluarga dalam satu instalasi, sepenuhnya te
 - Fitur **"Tambah Orang Tua"** di menu Pengaturan tetap untuk kasus berbeda: **mengundang pasangan (Ayah/Bunda) ke keluarga yang SAMA**, bukan untuk keluarga lain.
 - Pertimbangkan menambah halaman Ketentuan Layanan/Privasi bila akan dibagikan ke publik luas.
 
+### Aktifkan verifikasi email (Resend)
+
+Akun baru langsung bisa dipakai tanpa menunggu verifikasi (tak menghalangi onboarding), tapi ada pengingat halus + link verifikasi dikirim ke email saat daftar. Secara default `.env` produksi Anda memakai `MAIL_MAILER=log` (email verifikasi tak benar-benar terkirim, cuma masuk ke file log). Untuk mengaktifkannya:
+
+1. Daftar gratis di **[resend.com](https://resend.com)** (3.000 email/bulan gratis).
+2. Di dashboard Resend → **Domains** → tambahkan domain Anda (mis. `sandigma.com`) → ikuti instruksi menambah 2-3 record DNS (SPF/DKIM) di panel domain Anda → tunggu status jadi "Verified" (biasanya beberapa menit).
+3. Buat **API Key** di dashboard Resend.
+4. Edit `.env` di server:
+   ```env
+   MAIL_MAILER=resend
+   MAIL_FROM_ADDRESS="halo@sandigma.com"   # harus di domain yang sudah diverifikasi di langkah 2
+   MAIL_FROM_NAME="SANS FAMILY"
+   RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+   ```
+5. `php artisan config:clear`
+
+Selesai — email verifikasi (dan email lain di masa depan) sungguhan terkirim.
+
 ## Memindahkan data belakangan
 
 Sudah terlanjur pakai di rumah lalu baru deploy? Cukup salin 2 hal dari laptop ke server (timpa):

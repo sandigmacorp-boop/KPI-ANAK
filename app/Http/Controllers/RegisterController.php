@@ -35,6 +35,7 @@ class RegisterController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        $user->sendEmailVerificationNotification();
 
         return redirect()->route('home')
             ->with('ok', 'Akun berhasil dibuat! Selamat datang di '.config('app.name').' 🎉 Yuk tambahkan anak pertama Anda.');

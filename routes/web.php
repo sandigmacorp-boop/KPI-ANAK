@@ -5,6 +5,7 @@ use App\Http\Controllers\ChallengeSettingController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\ChildrenController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\FamilyGoalController;
 use App\Http\Controllers\KidController;
 use App\Http\Controllers\PointsController;
@@ -25,6 +26,15 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Verifikasi email (soft — tak memblokir pemakaian, hanya pengingat & link verifikasi)
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware('signed')->name('verification.verify');
+    Route::post('/email/verifikasi-ulang', [EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')->name('verification.send');
+});
 
 // Mode anak — tanpa login, lewat link rahasia per anak
 Route::get('/c/{token}/manifest.webmanifest', [KidController::class, 'manifest'])->name('kid.manifest');
