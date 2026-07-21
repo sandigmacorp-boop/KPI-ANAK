@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Child;
 use App\Models\Reward;
 use App\Models\Task;
+use App\Models\TeamChallenge;
 use App\Support\Mood;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,7 @@ class KidController extends Controller
             'slotNow' => $slot,
             'slotPending' => $child->pendingTasksInSlot($slot, $today),
             'familyGoal' => tap($child->familyGoal(), fn ($g) => $g?->refreshAchieved()),
+            'teamChallenges' => $child->teamChallenges(),
         ]);
     }
 
@@ -65,6 +67,7 @@ class KidController extends Controller
                 ->where(fn ($q) => $q->whereNotNull('delivered_at')->orWhereNotNull('canceled_at'))
                 ->latest()->limit(10)->get(),
             'familyGoal' => tap($child->familyGoal(), fn ($g) => $g?->refreshAchieved()),
+            'teamChallenges' => $child->teamChallenges(),
         ]);
     }
 
@@ -83,6 +86,29 @@ class KidController extends Controller
 
         return redirect()->route('kid.performa', $token)
             ->with('ok', "🎉 {$reward->emoji} {$reward->title} berhasil ditukar! Tunjukkan ke Ayah/Bunda untuk menerimanya.");
+    }
+
+    /** Anak (mewakili tim) mengirim laporan tantangan kerja sama — bisa lebih dari 1 foto. */
+    public function submitTeamChallenge(Request $request, string $token, TeamChallenge $challenge)
+    {
+        $child = Child::where('access_token', $token)->firstOrFail();
+        abort_unless($challenge->household_id === $child->household_id, 404);
+
+        if (! $challenge->isOpen()) {
+            return response()->json(['message' => 'Tantangan ini sedang menunggu persetujuan atau sudah selesai.'], 422);
+        }
+
+        $data = $request->validate([
+            'note' => ['nullable', 'string', 'max:200'],
+            'photos' => ['required', 'array', 'min:1', 'max:5'],
+            'photos.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+        ], [
+            'photos.required' => 'Sertakan minimal 1 foto bukti hasil kerja tim ya! 📷',
+        ]);
+
+        $challenge->submitReport($child, $data['photos'], $data['note'] ?? null);
+
+        return response()->json(['ok' => true]);
     }
 
     /** Data pengingat (untuk notifikasi perangkat & auto-refresh). */

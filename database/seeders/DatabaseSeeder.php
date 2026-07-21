@@ -9,6 +9,7 @@ use App\Models\PointAdjustment;
 use App\Models\Reward;
 use App\Models\Task;
 use App\Models\TaskCompletion;
+use App\Models\TeamChallenge;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -149,5 +150,15 @@ class DatabaseSeeder extends Seeder
             'target' => 2000,
         ]);
         $goal->forceFill(['created_at' => today()->subDays(7)])->save();
+
+        // Contoh tantangan kerja sama tim (masih terbuka, siap dicoba kirim laporan).
+        TeamChallenge::create([
+            'household_id' => $household->id,
+            'title' => 'Bersihkan Garasi Bersama',
+            'emoji' => '🧹',
+            'description' => 'Rapikan & sapu garasi bersama-sama, lalu foto sebelum dan sesudah.',
+            'points' => 50,
+            'status' => 'open',
+        ]);
     }
 }

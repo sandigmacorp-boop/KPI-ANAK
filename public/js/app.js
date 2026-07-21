@@ -348,6 +348,75 @@
         return ok;
     }
 
+    // ---- Tantangan tim: pilih & pratinjau banyak foto ----
+    document.addEventListener('change', (e) => {
+        if (!e.target.matches('.team-form input[type="file"]')) return;
+        const form = e.target.closest('.team-form');
+        const files = [...e.target.files];
+        const preview = form.querySelector('.team-preview');
+        const btn = form.querySelector('.team-submit-btn');
+
+        preview.innerHTML = '';
+        files.forEach((f) => {
+            const img = document.createElement('img');
+            img.className = 'team-preview-thumb';
+            img.src = URL.createObjectURL(f);
+            preview.appendChild(img);
+        });
+
+        btn.disabled = files.length === 0;
+        btn.textContent = files.length ? `📤 Kirim Laporan (${files.length} foto)` : '📤 Kirim Laporan';
+    });
+
+    // ---- Tantangan tim: kirim laporan (shrink tiap foto lalu upload) ----
+    document.addEventListener('submit', async (e) => {
+        const form = e.target.closest('.team-form');
+        if (!form) return;
+        e.preventDefault();
+
+        const fileInput = form.querySelector('input[type="file"]');
+        const files = [...fileInput.files];
+        if (!files.length) return;
+
+        const btn = form.querySelector('.team-submit-btn');
+        const prevText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Mengirim...';
+
+        try {
+            const body = new FormData();
+            const note = form.querySelector('.team-note-input')?.value.trim();
+            if (note) body.append('note', note);
+            for (const f of files) {
+                body.append('photos[]', await shrinkImage(f));
+            }
+
+            const res = await fetch(form.dataset.teamUrl, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                body,
+            });
+
+            if (res.status === 419) { location.reload(); return; }
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => null);
+                const firstError = err?.errors ? Object.values(err.errors)[0]?.[0] : null;
+                alert(firstError || err?.message || 'Gagal mengirim laporan.');
+                btn.disabled = false;
+                btn.textContent = prevText;
+                return;
+            }
+
+            showToast('📸 Laporan terkirim! Menunggu persetujuan Ayah/Bunda.');
+            setTimeout(() => location.reload(), 1400);
+        } catch {
+            alert('Gagal mengirim laporan. Periksa koneksi lalu coba lagi.');
+            btn.disabled = false;
+            btn.textContent = prevText;
+        }
+    });
+
     // ---- Mood harian ----
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('.mood-btn');

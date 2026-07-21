@@ -56,6 +56,8 @@
 
         @include('partials.weekly-challenge')
 
+        @include('partials.team-challenges')
+
         @include('partials.checklist-board', ['mode' => 'kid'])
 
         <button type="button" id="enable-notif" class="btn btn-ghost btn-block" hidden

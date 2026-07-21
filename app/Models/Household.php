@@ -46,4 +46,9 @@ class Household extends Model
             ? $setting->toChallenge()
             : \App\Support\WeeklyChallenge::current() + ['custom' => false];
     }
+
+    public function teamChallenges(): HasMany
+    {
+        return $this->hasMany(TeamChallenge::class);
+    }
 }

@@ -36,6 +36,14 @@ class Child extends Model
         return $this->household?->activeGoal();
     }
 
+    /** Tantangan kerja sama tim milik keluarga ini, terbaru dulu. */
+    public function teamChallenges()
+    {
+        return $this->household
+            ? $this->household->teamChallenges()->with(['submissions.photos', 'submissions.child'])->latest()->get()
+            : collect();
+    }
+
     /** Orang tua yang menambahkan anak ini (informasional). */
     public function creator(): BelongsTo
     {

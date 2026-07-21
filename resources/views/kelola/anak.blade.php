@@ -152,6 +152,12 @@
         </form>
     </dialog>
 
+    <section class="card">
+        <h3 class="card-title">🤝 Tantangan Kerja Sama Tim</h3>
+        <p class="muted">Misi yang harus diselesaikan bersama seluruh anak, dilaporkan dengan foto, dan disetujui Anda sebelum poin cair ke semua anak.</p>
+        <a class="btn btn-primary btn-block" href="{{ route('team.index') }}">🤝 Kelola Tantangan Tim</a>
+    </section>
+
     <button type="button" class="btn btn-primary btn-block" data-dialog="dlg-anak-baru">➕ Tambah Anak</button>
 
     @forelse ($children as $child)

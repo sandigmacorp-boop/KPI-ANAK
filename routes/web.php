@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RewardsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TasksController;
+use App\Http\Controllers\TeamChallengeController;
 use Illuminate\Support\Facades\Route;
 
 // Autentikasi orang tua
@@ -34,6 +35,8 @@ Route::post('/c/{token}/mood', [KidController::class, 'setMood'])
     ->middleware('throttle:60,1')->name('kid.mood');
 Route::post('/c/{token}/tukar/{reward}', [KidController::class, 'redeem'])
     ->middleware('throttle:20,1')->name('kid.redeem');
+Route::post('/c/{token}/tim/{challenge}/kirim', [KidController::class, 'submitTeamChallenge'])
+    ->middleware('throttle:20,1')->name('kid.team.submit');
 
 // Area orang tua
 Route::middleware('auth')->group(function () {
@@ -47,6 +50,13 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/kelola/tantangan', [ChallengeSettingController::class, 'store'])->name('challenge.store');
     Route::delete('/kelola/tantangan', [ChallengeSettingController::class, 'reset'])->name('challenge.reset');
+
+    Route::get('/kelola/tim', [TeamChallengeController::class, 'index'])->name('team.index');
+    Route::post('/kelola/tim', [TeamChallengeController::class, 'store'])->name('team.store');
+    Route::put('/kelola/tim/{challenge}', [TeamChallengeController::class, 'update'])->name('team.update');
+    Route::delete('/kelola/tim/{challenge}', [TeamChallengeController::class, 'destroy'])->name('team.destroy');
+    Route::post('/kelola/tim/laporan/{submission}/setuju', [TeamChallengeController::class, 'approve'])->name('team.approve');
+    Route::post('/kelola/tim/laporan/{submission}/tolak', [TeamChallengeController::class, 'reject'])->name('team.reject');
 
     Route::post('/kelola/tujuan', [FamilyGoalController::class, 'store'])->name('goals.store');
     Route::post('/kelola/tujuan/{goal}/selesai', [FamilyGoalController::class, 'claim'])->name('goals.claim');
