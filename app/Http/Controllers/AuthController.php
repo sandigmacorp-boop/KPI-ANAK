@@ -20,8 +20,18 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, remember: true)) {
+            $user = $request->user();
+
+            if ($user->household?->isDisabled()) {
+                Auth::logout();
+
+                return back()
+                    ->withErrors(['email' => 'Akun keluarga ini telah dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.'])
+                    ->onlyInput('email');
+            }
+
             $request->session()->regenerate();
-            $request->user()->forceFill(['last_login_at' => now()])->save();
+            $user->forceFill(['last_login_at' => now()])->save();
 
             return redirect()->intended('/');
         }

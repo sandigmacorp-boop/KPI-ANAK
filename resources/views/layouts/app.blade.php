@@ -27,6 +27,9 @@
         @if (session('ok'))
             <div class="flash" role="status">✅ {{ session('ok') }}</div>
         @endif
+        @if (session('err'))
+            <div class="errors" role="alert">{{ session('err') }}</div>
+        @endif
 
         @auth
             @unless (auth()->user()->hasVerifiedEmail())

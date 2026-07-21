@@ -6,6 +6,8 @@
 @section('content')
     <p class="date-line">Monitor seluruh keluarga & anak lintas-tenant — hanya terlihat oleh admin.</p>
 
+    <a href="{{ route('admin.email.edit') }}" class="btn btn-ghost btn-block">📧 Pengaturan Email (Resend)</a>
+
     {{-- Ringkasan angka --}}
     <div class="stat-grid">
         <div class="card stat">
@@ -91,11 +93,25 @@
                     </span>
                 </div>
                 <span class="admin-household-active">
-                    @if ($h->last_active_at)
+                    @if ($h->isDisabled())
+                        <span class="chip chip-danger">⛔ nonaktif</span>
+                    @elseif ($h->last_active_at)
                         <span class="chip chip-done">{{ $h->last_active_at->diffForHumans() }}</span>
                     @else
                         <span class="chip chip-muted">belum ada aktivitas</span>
                     @endif
+
+                    @unless ($h->id === auth()->user()->household_id)
+                        <form method="post" action="{{ route('admin.household.toggle', $h) }}"
+                              data-confirm="{{ $h->isDisabled()
+                                  ? 'Aktifkan kembali keluarga '.$h->name.'?'
+                                  : 'Nonaktifkan keluarga '.$h->name.'? Semua anggotanya langsung logout & tak bisa akses lagi.' }}">
+                            @csrf
+                            <button class="btn btn-sm {{ $h->isDisabled() ? 'btn-primary' : 'btn-danger' }}">
+                                {{ $h->isDisabled() ? '✅ Aktifkan' : '⛔ Nonaktifkan' }}
+                            </button>
+                        </form>
+                    @endunless
                 </span>
             </div>
         @endforeach

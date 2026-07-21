@@ -12,9 +12,18 @@ use Illuminate\Validation\Rule;
 
 class KidController extends Controller
 {
-    public function show(string $token)
+    /** Ambil anak dari token akses, atau 404 — 403 kalau keluarganya sedang dinonaktifkan admin. */
+    private function resolveChild(string $token): Child
     {
         $child = Child::where('access_token', $token)->firstOrFail();
+        abort_if($child->household?->isDisabled(), 403, 'Akun keluarga ini sedang dinonaktifkan.');
+
+        return $child;
+    }
+
+    public function show(string $token)
+    {
+        $child = $this->resolveChild($token);
         $child->syncWeeklyChallenge();
         $today = today();
         $stats = $child->statsForDate($today);
@@ -40,7 +49,7 @@ class KidController extends Controller
     /** Dashboard performa milik si anak (tanpa login). */
     public function performa(string $token)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         $child->syncAchievements();
         $child->syncWeeklyChallenge();
 
@@ -74,7 +83,7 @@ class KidController extends Controller
     /** Anak menukar poin dengan hadiah dari katalog. */
     public function redeem(string $token, Reward $reward)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         abort_unless($reward->child_id === $child->id && $reward->is_active, 404);
 
         if (! $child->canAfford($reward)) {
@@ -91,7 +100,7 @@ class KidController extends Controller
     /** Anak (mewakili tim) mengirim laporan tantangan kerja sama — bisa lebih dari 1 foto. */
     public function submitTeamChallenge(Request $request, string $token, TeamChallenge $challenge)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         abort_unless($challenge->household_id === $child->household_id, 404);
 
         if (! $challenge->isOpen()) {
@@ -114,7 +123,7 @@ class KidController extends Controller
     /** Data pengingat (untuk notifikasi perangkat & auto-refresh). */
     public function reminder(string $token)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         $slot = Task::currentSlot();
         $pending = $child->pendingTasksInSlot($slot, today());
 
@@ -131,7 +140,7 @@ class KidController extends Controller
     /** Anak mencatat perasaannya hari ini. */
     public function setMood(Request $request, string $token)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         $data = $request->validate(['mood' => ['required', Rule::in(array_keys(Mood::MOODS))]]);
         $child->setMood($data['mood'], today());
 
@@ -140,7 +149,7 @@ class KidController extends Controller
 
     public function toggle(Request $request, string $token, Task $task)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
         abort_unless($task->child_id === $child->id, 404);
 
         $request->validate(['photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240']]);
@@ -166,7 +175,7 @@ class KidController extends Controller
     /** Manifest PWA khusus per anak, agar bisa di-install di perangkat si anak. */
     public function manifest(string $token)
     {
-        $child = Child::where('access_token', $token)->firstOrFail();
+        $child = $this->resolveChild($token);
 
         return response()->json([
             'name' => 'Tugas '.$child->name,

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminMailSettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeSettingController;
 use App\Http\Controllers\ChecklistController;
@@ -53,12 +54,17 @@ Route::post('/c/{token}/tim/{challenge}/kirim', [KidController::class, 'submitTe
     ->middleware('throttle:20,1')->name('kid.team.submit');
 
 // Dashboard admin platform — lintas-keluarga, khusus akun is_admin
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'household.active', 'admin'])->group(function () {
     Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/keluarga/{household}/status', [AdminDashboardController::class, 'toggleHouseholdStatus'])->name('admin.household.toggle');
+
+    Route::get('/admin/email', [AdminMailSettingsController::class, 'edit'])->name('admin.email.edit');
+    Route::put('/admin/email', [AdminMailSettingsController::class, 'update'])->name('admin.email.update');
+    Route::post('/admin/email/tes', [AdminMailSettingsController::class, 'test'])->name('admin.email.test');
 });
 
 // Area orang tua
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'household.active'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('home');
 
     Route::get('/anak/{child}/checklist/{date?}', [ChecklistController::class, 'show'])

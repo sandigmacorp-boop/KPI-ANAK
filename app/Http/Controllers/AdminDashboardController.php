@@ -8,6 +8,7 @@ use App\Models\Redemption;
 use App\Models\TaskCompletion;
 use App\Models\TeamChallengeSubmission;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,23 @@ class AdminDashboardController extends Controller
             'activity' => $this->recentActivity(),
             'health' => $this->systemHealth(),
         ]);
+    }
+
+    /** Aktifkan/nonaktifkan sebuah keluarga. Nonaktif -> semua sesi login keluarga itu langsung diputus. */
+    public function toggleHouseholdStatus(Request $request, Household $household)
+    {
+        abort_if($household->id === $request->user()->household_id, 422, 'Tidak bisa menonaktifkan keluarga sendiri.');
+
+        if ($household->isDisabled()) {
+            $household->forceFill(['disabled_at' => null])->save();
+            $message = "Keluarga {$household->name} diaktifkan kembali.";
+        } else {
+            $household->forceFill(['disabled_at' => now()])->save();
+            DB::table('sessions')->whereIn('user_id', $household->users()->pluck('id'))->delete();
+            $message = "Keluarga {$household->name} dinonaktifkan — semua sesi login keluarga ini langsung diputus.";
+        }
+
+        return back()->with('ok', $message);
     }
 
     private function summaryStats(): array

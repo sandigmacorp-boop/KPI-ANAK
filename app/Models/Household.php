@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name'])]
 class Household extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'disabled_at' => 'datetime',
+        ];
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
@@ -50,5 +57,11 @@ class Household extends Model
     public function teamChallenges(): HasMany
     {
         return $this->hasMany(TeamChallenge::class);
+    }
+
+    /** Apakah keluarga ini dinonaktifkan admin (login & mode anak ikut terkunci). */
+    public function isDisabled(): bool
+    {
+        return $this->disabled_at !== null;
     }
 }

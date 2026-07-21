@@ -14,7 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo('/');
-        $middleware->alias(['admin' => \App\Http\Middleware\EnsureIsAdmin::class]);
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
+            'household.active' => \App\Http\Middleware\EnsureHouseholdActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Fetch AJAX (Accept: application/json) juga harus menerima error sebagai JSON.
