@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Masuk')
-@section('page-title', 'KPI Anak')
+@section('page-title', config('app.name'))
 
 @section('content')
     <div class="login-wrap">
@@ -22,5 +22,7 @@
             </label>
             <button class="btn btn-primary btn-block">Masuk</button>
         </form>
+
+        <p class="muted auth-switch">Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
     </div>
 @endsection

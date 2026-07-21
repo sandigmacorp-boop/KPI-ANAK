@@ -18,6 +18,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Pengaman produksi: seeder ini membuat akun demo dengan kata sandi yang
+        // dikenal publik (didokumentasikan di README). Jangan pernah jalan di luar
+        // local/testing — akun asli dibuat lewat halaman /daftar.
+        if (! app()->environment(['local', 'testing'])) {
+            $this->command?->error('Seeder demo dilewati: hanya boleh dijalankan di APP_ENV=local/testing. Gunakan halaman "Daftar" untuk membuat akun asli.');
+
+            return;
+        }
+
         $household = Household::create(['name' => 'Keluarga Sandigma']);
 
         $user = User::create([

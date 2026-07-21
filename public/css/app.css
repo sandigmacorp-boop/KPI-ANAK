@@ -588,6 +588,9 @@ dialog::backdrop { background: rgba(41, 30, 10, 0.45); }
 .login-hero h2 { margin: 0 0 4px; font-size: 24px; font-weight: 800; }
 .login-hero p { margin: 0; }
 
+.auth-switch { text-align: center; margin-top: 16px; font-size: 14px; }
+.auth-switch a { color: var(--brand); font-weight: 700; }
+
 /* ---------- Statistik & grafik ---------- */
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .stat { display: flex; flex-direction: column; gap: 3px; margin-bottom: 0; padding: 14px; }

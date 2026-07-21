@@ -14,7 +14,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 > Saat pertama kali Windows bertanya soal firewall untuk PHP, pilih **Allow access** supaya HP bisa mengakses.
 
-## Login awal
+## Login awal (data contoh — hanya untuk pengembangan lokal)
 
 | | |
 |---|---|
@@ -29,6 +29,16 @@ Database berisi data contoh (anak "Kakak" & "Adik" + tugas + riwayat seminggu). 
 ```bash
 php artisan migrate:fresh --seed
 ```
+
+> Seeder ini otomatis **tidak berjalan** bila `APP_ENV=production` (mencegah akun demo berpassword publik ikut aktif di server). Di produksi, buat akun lewat halaman **`/daftar`** — lihat bagian *Multi-keluarga* di bawah.
+
+## Multi-keluarga — orang tua lain bisa daftar sendiri
+
+Aplikasi ini mendukung banyak keluarga dalam satu instalasi, **sepenuhnya terisolasi** satu sama lain:
+
+- Buka **`/daftar`** untuk membuat akun keluarga baru. Setiap akun otomatis mendapat "keluarga" (household) sendiri — anak, tugas, poin, hadiah, tantangan, dan link mode anak tidak pernah terlihat oleh keluarga lain.
+- Untuk **mengundang pasangan** (Ayah/Bunda) ke keluarga yang **sama**, gunakan tombol *"➕ Tambah Orang Tua"* di menu Pengaturan — beda dengan `/daftar` yang membuat keluarga baru terpisah.
+- Cocok untuk dibagikan ke keluarga/teman lain memakai server yang sama, atau untuk dijadikan layanan publik. Lihat `DEPLOY.md` bagian **"Multi-keluarga (SaaS)"** untuk detail keamanan produksi.
 
 ## Membuka dari HP
 

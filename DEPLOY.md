@@ -24,7 +24,7 @@ Klik dua kali **`buat-paket-hosting.bat`** di folder project. Skrip akan menghas
 - file `.env` produksi dengan `APP_KEY` baru, `APP_DEBUG=false`, timezone WIB,
 - **database & foto bukti saat ini** (akun, anak, tugas, riwayat ikut pindah).
 
-Ingin mulai dari nol di server? Jalankan dengan opsi: `deploy\buat-paket-hosting.ps1 -TanpaData` — lalu di server jalankan `php artisan migrate --seed` sekali.
+Ingin mulai dari nol di server (mis. untuk dipakai keluarga/orang tua lain — lihat bagian **"Multi-keluarga (SaaS)"** di bawah)? Jalankan dengan opsi: `deploy\buat-paket-hosting.ps1 -TanpaData` — lalu di server jalankan `php artisan migrate` (⚠️ **bukan** `--seed`, itu akun demo dengan kata sandi publik) dan buka `/daftar` untuk membuat akun pertama.
 
 ---
 
@@ -158,7 +158,16 @@ SQLite sudah lebih dari cukup untuk satu keluarga (dan backup-nya semudah menyal
    DB_USERNAME=namauser_sans
    DB_PASSWORD=rahasia
    ```
-3. Terminal: `php artisan migrate --seed` (data SQLite lama tidak otomatis pindah — mulai baru, atau minta bantuan migrasi data).
+3. Terminal: `php artisan migrate` lalu buka `/daftar` untuk membuat akun (data SQLite lama tidak otomatis pindah — mulai baru, atau minta bantuan migrasi data).
+
+## Multi-keluarga (SaaS) — satu instal, banyak orang tua
+
+Aplikasi ini sudah mendukung banyak keluarga dalam satu instalasi, sepenuhnya terisolasi: tiap orang tua yang membuka **`/daftar`** dan membuat akun otomatis mendapat "keluarga" (household) sendiri — anak, tugas, poin, hadiah, tantangan, dan link mode anak milik satu keluarga **tidak pernah terlihat** oleh keluarga lain, walau dijalankan di server yang sama.
+
+- **Jangan** jalankan `php artisan db:seed` / `migrate --seed` di server produksi — seeder itu hanya untuk data contoh saat pengembangan lokal (sengaja diblokir otomatis bila `APP_ENV=production`).
+- Bagikan saja alamat situs (mis. `https://sans.sandigma.com/daftar`) ke orang tua lain — mereka daftar sendiri, tanpa perlu Anda buatkan akun.
+- Fitur **"Tambah Orang Tua"** di menu Pengaturan tetap untuk kasus berbeda: **mengundang pasangan (Ayah/Bunda) ke keluarga yang SAMA**, bukan untuk keluarga lain.
+- Pertimbangkan menambah halaman Ketentuan Layanan/Privasi bila akan dibagikan ke publik luas.
 
 ## Memindahkan data belakangan
 
