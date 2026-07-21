@@ -153,7 +153,6 @@ class AdminDashboardController extends Controller
             'db_size_mb' => $dbBytes !== null ? round($dbBytes / 1048576, 1) : null,
             'is_sqlite' => $isSqlite,
             'php_version' => PHP_VERSION,
-            'laravel_version' => app()->version(),
         ];
     }
 }

@@ -46,8 +46,8 @@
                     <td class="num">{{ $health['is_sqlite'] ? $health['db_size_mb'].' MB (SQLite)' : 'MySQL (lihat panel hosting)' }}</td>
                 </tr>
                 <tr>
-                    <td>⚙️ Versi</td>
-                    <td class="num">PHP {{ $health['php_version'] }} · Laravel {{ $health['laravel_version'] }}</td>
+                    <td>⚙️ Versi PHP</td>
+                    <td class="num">{{ $health['php_version'] }}</td>
                 </tr>
             </tbody>
         </table>

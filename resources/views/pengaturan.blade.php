@@ -133,5 +133,5 @@
         <button class="btn btn-ghost btn-block">🚪 Keluar</button>
     </form>
 
-    <p class="legend muted">{{ config('app.name') }} · Laravel {{ app()->version() }}</p>
+    <p class="legend muted">⭐ {{ config('app.name') }}</p>
 @endsection
