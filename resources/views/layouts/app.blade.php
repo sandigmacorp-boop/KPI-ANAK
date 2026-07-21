@@ -54,6 +54,11 @@
             <a href="{{ route('settings') }}" class="{{ request()->routeIs('settings') ? 'active' : '' }}">
                 <span class="nav-ico">⚙️</span>Pengaturan
             </a>
+            @if (auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                    <span class="nav-ico">🛡️</span>Admin
+                </a>
+            @endif
         </nav>
     @endauth
 </div>

@@ -26,12 +26,15 @@ class RegisterController extends Controller
         // penuh dari keluarga lain (anak, tugas, poin, dst. tak saling terlihat).
         $household = Household::create(['name' => 'Keluarga '.$data['name']]);
 
+        // last_login_at & is_admin sengaja TIDAK di $fillable (bukan input pengguna) —
+        // diisi via forceFill agar aman dari mass-assignment.
         $user = User::create([
             'household_id' => $household->id,
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'],
         ]);
+        $user->forceFill(['last_login_at' => now()])->save();
 
         Auth::login($user);
         $request->session()->regenerate();

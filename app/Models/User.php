@@ -47,6 +47,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return filled($this->telegram_chat_id);
     }
 
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -56,6 +61,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'is_admin' => 'boolean',
             'password' => 'hashed',
         ];
     }

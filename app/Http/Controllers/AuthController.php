@@ -21,6 +21,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, remember: true)) {
             $request->session()->regenerate();
+            $request->user()->forceFill(['last_login_at' => now()])->save();
 
             return redirect()->intended('/');
         }

@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'sandigmacorp@gmail.com',
             'password' => 'kpianak123',
         ]);
+        $user->forceFill(['is_admin' => true, 'email_verified_at' => now()])->save();
 
         $kakak = Child::create([
             'user_id' => $user->id,

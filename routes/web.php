@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChallengeSettingController;
 use App\Http\Controllers\ChecklistController;
@@ -50,6 +51,11 @@ Route::post('/c/{token}/tukar/{reward}', [KidController::class, 'redeem'])
     ->middleware('throttle:20,1')->name('kid.redeem');
 Route::post('/c/{token}/tim/{challenge}/kirim', [KidController::class, 'submitTeamChallenge'])
     ->middleware('throttle:20,1')->name('kid.team.submit');
+
+// Dashboard admin platform — lintas-keluarga, khusus akun is_admin
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
 
 // Area orang tua
 Route::middleware('auth')->group(function () {
