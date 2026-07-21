@@ -101,10 +101,16 @@ class Child extends Model
         ];
     }
 
+    /** Tantangan efektif pekan ini (pilihan orang tua bila ada, selain itu otomatis). */
+    public function weeklyChallenge(): array
+    {
+        return $this->household?->challengeForWeek() ?? WeeklyChallenge::current() + ['custom' => false];
+    }
+
     /** Progres tantangan pekan ini untuk ditampilkan. */
     public function weeklyChallengeProgress(): array
     {
-        $ch = WeeklyChallenge::current();
+        $ch = $this->weeklyChallenge();
         $metrics = $this->weeklyChallengeMetrics();
         $value = min((int) ($metrics[$ch['metric']] ?? 0), $ch['target']);
 
@@ -123,7 +129,7 @@ class Child extends Model
             return null;
         }
 
-        $ch = WeeklyChallenge::current();
+        $ch = $this->weeklyChallenge();
         if (($this->weeklyChallengeMetrics()[$ch['metric']] ?? 0) >= $ch['target']) {
             $this->challengeCompletions()->create([
                 'week_key' => $weekKey,

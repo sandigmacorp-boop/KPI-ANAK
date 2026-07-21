@@ -21,6 +21,8 @@ class ChildrenController extends Controller
         return view('kelola.anak', [
             'children' => $children,
             'activeGoal' => tap($request->user()->household?->activeGoal(), fn ($g) => $g?->refreshAchieved()),
+            'weeklyChallenge' => $request->user()->household?->challengeForWeek()
+                ?? \App\Support\WeeklyChallenge::current() + ['custom' => false],
         ]);
     }
 

@@ -30,4 +30,20 @@ class Household extends Model
     {
         return $this->goals()->whereNull('claimed_at')->latest()->first();
     }
+
+    public function challengeSettings(): HasMany
+    {
+        return $this->hasMany(ChallengeSetting::class);
+    }
+
+    /** Tantangan efektif pekan ini: pilihan orang tua bila ada, selain itu rotasi otomatis. */
+    public function challengeForWeek(?string $weekKey = null): array
+    {
+        $weekKey ??= \App\Support\WeeklyChallenge::weekKey();
+        $setting = $this->challengeSettings()->where('week_key', $weekKey)->first();
+
+        return $setting
+            ? $setting->toChallenge()
+            : \App\Support\WeeklyChallenge::current() + ['custom' => false];
+    }
 }

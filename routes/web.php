@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChallengeSettingController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\ChildrenController;
 use App\Http\Controllers\DashboardController;
@@ -43,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/anak/{child}/toggle/{task}', [ChecklistController::class, 'toggle'])->name('checklist.toggle');
     Route::post('/anak/{child}/mood', [ChecklistController::class, 'setMood'])->name('checklist.mood');
     Route::get('/anak/{child}/laporan', [ReportController::class, 'show'])->name('report');
+
+    Route::post('/kelola/tantangan', [ChallengeSettingController::class, 'store'])->name('challenge.store');
+    Route::delete('/kelola/tantangan', [ChallengeSettingController::class, 'reset'])->name('challenge.reset');
 
     Route::post('/kelola/tujuan', [FamilyGoalController::class, 'store'])->name('goals.store');
     Route::post('/kelola/tujuan/{goal}/selesai', [FamilyGoalController::class, 'claim'])->name('goals.claim');

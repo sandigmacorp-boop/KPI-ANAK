@@ -61,6 +61,97 @@
         </form>
     </dialog>
 
+    <section class="card">
+        <h3 class="card-title">🔄 Tantangan Pekan Ini</h3>
+        <div class="goal-head">
+            <span class="goal-emoji" aria-hidden="true">{{ $weeklyChallenge['emoji'] }}</span>
+            <div class="goal-body">
+                <b class="goal-title">{{ $weeklyChallenge['title'] }}</b>
+                <span class="muted">{{ $weeklyChallenge['desc'] }} · bonus <b>+{{ $weeklyChallenge['bonus'] }} poin</b></span>
+                <span class="chip {{ $weeklyChallenge['custom'] ? 'chip-gift' : 'chip-muted' }}">
+                    {{ $weeklyChallenge['custom'] ? '✏️ Diatur orang tua' : '🔄 Otomatis (rotasi pekanan)' }}
+                </span>
+            </div>
+        </div>
+        <div class="row-actions">
+            <button type="button" class="btn btn-primary btn-sm" data-dialog="dlg-challenge">⚙️ Atur Tantangan</button>
+            @if ($weeklyChallenge['custom'])
+                <form method="post" action="{{ route('challenge.reset') }}"
+                      data-confirm="Kembalikan tantangan pekan ini ke rotasi otomatis?">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-ghost btn-sm">🔄 Kembali otomatis</button>
+                </form>
+            @endif
+        </div>
+    </section>
+
+    <dialog id="dlg-challenge" class="sheet">
+        <form method="post" action="{{ route('challenge.store') }}">
+            @csrf
+            <input type="hidden" name="_form" value="dlg-challenge">
+            <div class="sheet-head">
+                <h3>Atur Tantangan Pekan Ini</h3>
+                <button type="button" class="iconbtn" data-close aria-label="Tutup">✕</button>
+            </div>
+            @include('partials.errors')
+
+            <div class="field">
+                <span class="field-label">Pilih tantangan siap pakai</span>
+                <div class="picker">
+                    @foreach (\App\Support\WeeklyChallenge::LIST as $p)
+                        <label class="pick day">
+                            <input type="radio" name="choice" value="{{ $p['key'] }}"
+                                   @checked(! $weeklyChallenge['custom'] && $weeklyChallenge['key'] === $p['key'])>
+                            <span>{{ $p['emoji'] }} {{ $p['title'] }}</span>
+                        </label>
+                    @endforeach
+                    <label class="pick day">
+                        <input type="radio" name="choice" value="custom" @checked($weeklyChallenge['custom'])>
+                        <span>✏️ Custom</span>
+                    </label>
+                </div>
+            </div>
+
+            <p class="muted field-hint">Kolom di bawah hanya dipakai bila memilih <b>✏️ Custom</b>.</p>
+
+            @php($isCustom = $weeklyChallenge['custom'])
+            @php($resub = old('_form') === 'dlg-challenge')
+            <label class="field">Judul tantangan
+                <input name="title" maxlength="60" placeholder="contoh: Pekan Beres-beres"
+                       value="{{ $resub ? old('title') : ($isCustom ? $weeklyChallenge['title'] : '') }}">
+            </label>
+            <div class="field">
+                <span class="field-label">Ikon</span>
+                <div class="picker">
+                    @php($chEmojis = ['🎯', '🧹', '📚', '🏃', '💰', '⭐', '📸', '🌙', '🍎', '🎨'])
+                    @php($chEmoji = $resub ? old('emoji', '🎯') : ($isCustom ? $weeklyChallenge['emoji'] : '🎯'))
+                    @foreach (in_array($chEmoji, $chEmojis) ? $chEmojis : array_merge([$chEmoji], $chEmojis) as $e)
+                        <label class="pick"><input type="radio" name="emoji" value="{{ $e }}" @checked($chEmoji === $e)><span>{{ $e }}</span></label>
+                    @endforeach
+                </div>
+            </div>
+            <label class="field">Ukuran yang dihitung
+                <select name="metric">
+                    @php($chMetric = $resub ? old('metric') : ($isCustom ? $weeklyChallenge['metric'] : 'weekly_tasks'))
+                    @foreach (\App\Support\WeeklyChallenge::METRICS as $k => $label)
+                        <option value="{{ $k }}" @selected($chMetric === $k)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </label>
+            <div class="grid-2">
+                <label class="field">Target
+                    <input type="number" name="target" min="1" max="10000"
+                           value="{{ $resub ? old('target') : ($isCustom ? $weeklyChallenge['target'] : 25) }}">
+                </label>
+                <label class="field">Bonus poin
+                    <input type="number" name="bonus" min="1" max="1000"
+                           value="{{ $resub ? old('bonus') : ($isCustom ? $weeklyChallenge['bonus'] : 40) }}">
+                </label>
+            </div>
+            <button class="btn btn-primary btn-block">Simpan</button>
+        </form>
+    </dialog>
+
     <button type="button" class="btn btn-primary btn-block" data-dialog="dlg-anak-baru">➕ Tambah Anak</button>
 
     @forelse ($children as $child)

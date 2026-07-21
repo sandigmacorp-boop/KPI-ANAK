@@ -15,6 +15,25 @@ class WeeklyChallenge
         ['key' => 'fotografer', 'emoji' => '📸', 'title' => 'Fotografer Cilik', 'desc' => 'Kirim 8 foto bukti pekan ini', 'metric' => 'weekly_photos', 'target' => 8, 'bonus' => 30],
     ];
 
+    /** Ukuran yang bisa dipakai untuk tantangan custom. */
+    public const METRICS = [
+        'weekly_tasks' => 'Jumlah tugas selesai pekan ini',
+        'weekly_points' => 'Poin terkumpul pekan ini',
+        'weekly_perfect' => 'Hari KPI 100% pekan ini',
+        'weekly_photos' => 'Foto bukti terkirim pekan ini',
+    ];
+
+    public static function preset(string $key): ?array
+    {
+        foreach (self::LIST as $c) {
+            if ($c['key'] === $key) {
+                return $c;
+            }
+        }
+
+        return null;
+    }
+
     public static function current(?CarbonInterface $date = null): array
     {
         $week = (int) ($date ?? today())->format('W'); // nomor pekan ISO 01-53
