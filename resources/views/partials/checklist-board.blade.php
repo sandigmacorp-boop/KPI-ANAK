@@ -40,23 +40,31 @@
                 @foreach ($tasks[$slotKey] as $task)
                     @php($done = in_array($task->id, $stats['done_ids']))
                     @php($photoPath = $stats['photos'][$task->id] ?? null)
+                    {{-- Kunci waktu cuma berlaku di mode anak untuk hari ini; orang tua tetap bisa koreksi kapan saja. --}}
+                    @php($locked = ! $isAdmin && $day->isToday() && $task->isSlotOver())
                     <button type="button"
-                            class="task-item {{ $done ? 'done' : '' }}"
+                            class="task-item {{ $done ? 'done' : '' }} {{ $locked ? 'locked' : '' }}"
                             data-toggle-url="{{ $isAdmin
                                 ? route('checklist.toggle', [$child, $task])
                                 : route('kid.toggle', [$child->access_token, $task]) }}"
                             data-photo="{{ $task->requires_photo ? 1 : 0 }}"
-                            data-has-photo="{{ $photoPath ? 1 : 0 }}">
+                            data-has-photo="{{ $photoPath ? 1 : 0 }}"
+                            @if ($locked) disabled @endif>
                         <span class="task-emoji" aria-hidden="true">{{ $task->emoji }}</span>
                         <span class="task-body">
                             <span class="task-title">{{ $task->title }}</span>
-                            <span class="task-sub">{{ $task->points }} poin{{ $task->requires_photo ? ' · 📷 wajib foto' : '' }}</span>
+                            <span class="task-sub">
+                                {{ $task->points }} poin{{ $task->requires_photo ? ' · 📷 wajib foto' : '' }}
+                                @if ($locked && ! $done)
+                                    · ⏰ waktu habis
+                                @endif
+                            </span>
                         </span>
                         <img class="proof-thumb"
                              src="{{ $photoPath ? \App\Support\ProofPhoto::url($photoPath) : '' }}"
                              alt="Lihat bukti foto" title="Lihat bukti foto"
                              @unless ($photoPath) hidden @endunless>
-                        <span class="task-check" aria-hidden="true">✓</span>
+                        <span class="task-check" aria-hidden="true">{{ $locked && ! $done ? '🔒' : '✓' }}</span>
                     </button>
                 @endforeach
             </div>

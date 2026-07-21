@@ -32,6 +32,14 @@ class Task extends Model
         return null;
     }
 
+    /** Apakah jam batas ("until") slot tugas ini untuk hari ini sudah lewat dibanding waktu sekarang. */
+    public function isSlotOver(?\Carbon\CarbonInterface $at = null): bool
+    {
+        $slot = self::SLOTS[$this->time_slot] ?? null;
+
+        return $slot !== null && ($at ?? now())->format('H:i') > $slot['until'];
+    }
+
     public const DAY_NAMES = [1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'Sab', 7 => 'Min'];
 
     protected function casts(): array

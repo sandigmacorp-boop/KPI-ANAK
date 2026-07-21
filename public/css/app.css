@@ -243,6 +243,8 @@ body {
 .task-item.static { cursor: default; }
 .task-item.static:active { transform: none; }
 .task-item.inactive { opacity: 0.55; }
+.task-item.locked:not(.done) { opacity: 0.6; cursor: not-allowed; }
+.task-item.locked:not(.done):active { transform: none; }
 .task-actions { display: flex; gap: 6px; align-items: center; }
 .task-actions form { display: contents; }
 .task-actions .iconbtn { width: 34px; height: 34px; font-size: 15px; }

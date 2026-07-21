@@ -145,6 +145,11 @@ class KidController extends Controller
 
         $request->validate(['photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240']]);
 
+        // Waktu slot tugas ini sudah lewat -> terkunci, tak bisa dicentang/dibatalkan lagi.
+        if ($task->isSlotOver()) {
+            return response()->json(['message' => '⏰ Waktu tugas ini sudah lewat, tidak bisa diubah lagi.'], 422);
+        }
+
         // Mode anak hanya boleh mencentang hari ini, dan tugas berfoto wajib pakai bukti.
         $isChecking = ! $child->completions()
             ->where('task_id', $task->id)
