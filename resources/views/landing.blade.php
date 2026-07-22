@@ -36,6 +36,23 @@
 <main class="landing-main">
 
     <section class="landing-section">
+        <h2>Begini Tampilannya</h2>
+        <p class="muted">Halaman utama tempat Anda memantau, dan checklist yang dilihat anak setiap hari.</p>
+        <div class="tour-screens">
+            <div class="tour-screen">
+                <div class="tour-screen-label"><h3>Halaman Utama</h3></div>
+                <p class="tour-cap">Kartu tiap anak: level peliharaan, streak, poin, dan berapa tugas yang masih tertunda hari ini.</p>
+                <div class="tour-phone"><img src="{{ asset('img/tur/04-beranda.png') }}" alt="Halaman utama orang tua"></div>
+            </div>
+            <div class="tour-screen">
+                <div class="tour-screen-label"><h3>Checklist Anak</h3></div>
+                <p class="tour-cap">Rincian tugas per waktu (pagi/siang/sore/malam), mood hari itu, dan progres KPI harian.</p>
+                <div class="tour-phone"><img src="{{ asset('img/tur/05-checklist.png') }}" alt="Checklist anak"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-section">
         <h2>Capek Mengingatkan Anak Berkali-kali Setiap Hari? 😮‍💨</h2>
         <p class="muted">
             "Ayo mandi!", "Rapikan mainanmu!", "Sudah gosok gigi belum?" — diucapkan berulang setiap hari sampai
