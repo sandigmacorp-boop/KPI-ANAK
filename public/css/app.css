@@ -740,6 +740,72 @@ dialog::backdrop { background: rgba(41, 30, 10, 0.45); }
     .landing-hero h1 { font-size: 34px; }
 }
 
+/* ---------- Tur screenshot publik ---------- */
+.tour-body { max-width: none; }
+
+.tour-nav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; max-width: 920px; margin: 0 auto;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+}
+.tour-logo { font-size: 17px; font-weight: 800; color: var(--ink); text-decoration: none; }
+
+.tour-masthead { max-width: 720px; margin: 0 auto; padding: 40px 20px 24px; text-align: center; }
+.tour-eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); margin: 0 0 14px; }
+.tour-masthead h1 { font-size: clamp(24px, 4.5vw, 32px); font-weight: 800; margin: 0 0 14px; text-wrap: balance; }
+.tour-lede { font-size: 15px; color: var(--ink-2); max-width: 60ch; margin: 0 auto; }
+.tour-meta { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tour-pill { font-size: 12.5px; font-weight: 600; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+
+.tour-toc { max-width: 920px; margin: 0 auto 8px; padding: 0 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.tour-toc a {
+    font-size: 13px; font-weight: 600; color: var(--ink-2); text-decoration: none;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px;
+}
+.tour-toc a:hover { color: var(--brand); border-color: var(--brand); }
+
+.tour-main { max-width: 920px; margin: 0 auto; padding: 20px 20px 40px; }
+
+.tour-chapter { position: relative; margin-top: 64px; }
+.tour-chapter:first-of-type { margin-top: 32px; }
+.tour-chapter-head { position: relative; padding-bottom: 18px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.tour-chapter-num {
+    position: absolute; right: 0; top: -30px; font-size: 72px; font-weight: 800;
+    color: color-mix(in srgb, var(--ink) 6%, transparent); line-height: 1; user-select: none;
+}
+.tour-kicker { font-size: 12.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); margin: 0 0 6px; }
+.tour-chapter-head h2 { font-size: 22px; font-weight: 800; margin: 0 0 8px; text-wrap: balance; }
+.tour-chapter-head p { margin: 0; color: var(--ink-2); font-size: 14.5px; max-width: 62ch; }
+
+.tour-screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-top: 24px; }
+.tour-screen { display: flex; flex-direction: column; gap: 12px; }
+.tour-screen-label { display: flex; align-items: baseline; gap: 9px; }
+.tour-screen-label h3 { font-size: 15px; font-weight: 700; margin: 0; }
+.tour-step {
+    font-weight: 700; font-size: 12.5px; color: var(--brand);
+    background: color-mix(in srgb, var(--brand) 12%, transparent); border-radius: 6px; padding: 2px 7px;
+}
+.tour-cap { font-size: 13px; color: var(--ink-2); margin: 0; }
+
+.tour-phone {
+    position: relative; border-radius: 26px; padding: 8px;
+    background: linear-gradient(160deg, var(--surface), var(--bg));
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.tour-phone img { display: block; width: 100%; height: auto; border-radius: 19px; border: 1px solid var(--line); }
+.tour-phone::before {
+    content: ""; position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 4px; border-radius: 3px; background: var(--line);
+}
+
+.tour-final-cta { text-align: center; padding: 56px 20px 20px; }
+.tour-final-cta h2 { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
+.tour-cta-btn { max-width: 360px; margin: 18px auto 0; }
+
+.tour-footer { max-width: 920px; margin: 0 auto; padding: 20px 20px 50px; text-align: center; font-size: 12.5px; }
+
 /* ---------- Animasi ---------- */
 @keyframes fadein { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 

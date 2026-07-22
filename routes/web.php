@@ -18,10 +18,14 @@ use App\Http\Controllers\RewardsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeamChallengeController;
+use App\Http\Controllers\TurController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page publik — media iklan sebelum login/daftar (auth -> lempar ke dashboard).
 Route::get('/', [LandingController::class, 'show'])->name('landing');
+
+// Tur screenshot publik — bisa dilihat siapa saja (login atau tidak), termasuk dari landing page.
+Route::get('/tur', [TurController::class, 'show'])->name('tur');
 
 // Autentikasi orang tua
 Route::middleware('guest')->group(function () {

@@ -26,7 +26,10 @@
             tumbuh sesuai kerajinan anak.
         </p>
         <a href="{{ route('register') }}" class="btn btn-primary btn-block landing-cta">🚀 Coba GRATIS Sekarang</a>
-        <p class="muted landing-reassure">Gratis selamanya untuk fitur inti · Tanpa kartu kredit · Siap pakai dalam 2 menit</p>
+        <p class="muted landing-reassure">
+            Gratis selamanya untuk fitur inti · Tanpa kartu kredit · Siap pakai dalam 2 menit ·
+            <a href="{{ route('tur') }}">Lihat preview tampilan →</a>
+        </p>
     </div>
 </header>
 
